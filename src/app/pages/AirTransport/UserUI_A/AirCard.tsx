@@ -1,47 +1,63 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const AirCard: React.FC = () => {
-  const [planes, setPlanes] = useState<any[]>([]); // State to hold plane data
+  const location = useLocation();
+  const { source, destination, departureDate, returnDate, numPassengers, travelClass } = location.state || {};
+  const [planes, setPlanes] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetching data from the API
+    if (!source || !destination) {
+      setError("Source and Destination airports are required.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Assuming API call is based on search criteria
     axios
-      .get("http://localhost:8080/flights/all") // Replace with your actual API endpoint
+      .get("http://localhost:8080/flights/search", {
+        params: {
+          source,
+          destination,
+          departureDate,
+          returnDate,
+          numPassengers,
+          travelClass,
+        },
+      })
       .then((response) => {
-        // Assuming the API response is an array of planes
-        const fetchedPlanes = response.data.map((plane: any) => ({
-          name: plane.flightName, // Mapping 'flightName' from API to 'name'
-          image: plane.imageUrl || "https://i.ndtvimg.com/i/2018-02/vistara_650x400_81519372774.jpg?downsize=773:435", // Default image
-          description: plane.description || "Description not available", // Ensure description is not undefined
-          rating: plane.rating || 4.5, // Default rating if not available
-          price: plane.price,
-        }));
-        setPlanes(fetchedPlanes);
-        console.log("Planes fetched:", fetchedPlanes);
+        console.log("Server Response:", response.data);  // Log the server response
+        setPlanes(response.data);
+        setIsLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching planes:", error);
+        setError("Error fetching plane data. Please try again later.");
+        setIsLoading(false);
       });
-  }, []); // Empty dependency array ensures it runs only once when the component mounts
+  }, [source, destination, departureDate, returnDate, numPassengers, travelClass]);
 
   const handleBookNow = (plane: any) => {
-    navigate("/AirDetails", { state: plane }); // Passing selected plane details to the new page
+    // Log the selected plane to ensure the correct data is passed
+    console.log("Selected Plane:", plane);
+    navigate("/AirDetails", { state: plane });
   };
+
+  if (isLoading) {
+    return <div>Loading planes...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f9f9f9" }}>
       <div style={{ maxWidth: "1200px", margin: "auto" }}>
-        <h2
-          style={{
-            textAlign: "center",
-            marginBottom: "2rem",
-            fontWeight: "bold",
-            color: "#333",
-          }}
-        >
+        <h2 style={{ textAlign: "center", marginBottom: "2rem", fontWeight: "bold", color: "#333" }}>
           Planes Available
         </h2>
         <div
@@ -61,41 +77,20 @@ const AirCard: React.FC = () => {
                 overflow: "hidden",
                 transition: "transform 0.2s ease-in-out",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.transform = "scale(1.03)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.transform = "scale(1)")
-              }
             >
+              {/* Plane Image (Use placeholder image for now) */}
               <img
-                src={plane.image}
+                src={plane.image || "https://img.freepik.com/free-photo/planes-wing-cuts-through-sky-cotton-candy-clouds-radiant-sunset_91128-4456.jpg?t=st=1736572556~exp=1736576156~hmac=491d3d288ba194849824f090134a7ddc9f21134fbc65010773baf4bb616221a3&w=1380"} // Placeholder image URL
                 alt={plane.name}
-                style={{
-                  width: "100%",
-                  height: "200px",
-                  objectFit: "cover",
-                }}
+                style={{ width: "100%", height: "200px", objectFit: "cover" }}
               />
               <div style={{ padding: "1rem" }}>
-                <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-                  {plane.name}
-                </h3>
-                <p
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#666",
-                    margin: "0.5rem 0",
-                  }}
-                >
-                  {plane.description}
-                </p>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>{plane.name}</h3>
+                <p style={{ fontSize: "0.9rem", color: "#666", margin: "0.5rem 0" }}>{plane.description}</p>
                 <p style={{ fontSize: "0.9rem", color: "#999" }}>
                   <strong>Rating:</strong> {plane.rating}
                 </p>
-                <p style={{ fontSize: "1rem", fontWeight: "bold" }}>
-                  Price: ₹{plane.price}
-                </p>
+                <p style={{ fontSize: "1rem", fontWeight: "bold" }}>Price: ₹{plane.price}</p>
                 <button
                   onClick={() => handleBookNow(plane)}
                   style={{
@@ -105,14 +100,7 @@ const AirCard: React.FC = () => {
                     borderRadius: "4px",
                     padding: "0.5rem 1rem",
                     cursor: "pointer",
-                    transition: "background-color 0.2s ease-in-out",
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#0056b3")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#007bff")
-                  }
                 >
                   Book Now
                 </button>

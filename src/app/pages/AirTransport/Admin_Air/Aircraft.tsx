@@ -17,6 +17,7 @@ export const PlansPage: React.FC = () => {
       try {
         const response = await axios.get(`${API_URL}/flights/all`);
         setFlights(response.data);
+        console.log("Flights response:", response.data);
       } catch (error) {
         console.error("Error fetching flights:", error);
       }
@@ -24,6 +25,8 @@ export const PlansPage: React.FC = () => {
 
     fetchFlights();
   }, []);
+
+  console.log(flights);
 
   const filteredFlights = flights.filter((flight) =>
     flight.flightName.toLowerCase().includes(search.toLowerCase())
@@ -143,6 +146,7 @@ export const PlansPage: React.FC = () => {
                         <button
                           type="button"
                           className="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
+                          onClick={()=>alert("clicked")}
                           // Delete button functionality
                         >
                           <i className="ki-duotone ki-trash fs-3 text-danger">

@@ -1,10 +1,12 @@
 import { FC, lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { MasterLayout } from "../../_metronic/layout/MasterLayout";
+import { FAQ } from "../pages/AirTransport/UserUI_A/FAQ";
 import TopBarProgress from "react-topbar-progress-indicator";
 import { DashboardWrapper } from "../pages/dashboard/DashboardWrapper";
 import { MenuTestPage } from "../pages/MenuTestPage";
 import { getCSSVariableValue } from "../../_metronic/assets/ts/_utils";
+import { MyBooking } from "../pages/AirTransport/UserUI_A/MyBooking";
 import { WithChildren } from "../../_metronic/helpers";
 import BuilderPageWrapper from "../pages/layout-builder/BuilderPageWrapper";
 import HomeMain from "../pages/WaterTransport/Userinterface/HomeMain";
@@ -13,6 +15,7 @@ import { ShipsPage } from "../pages/WaterTransport/Admin_Water/Ships";
 import { EmployeePage } from "../pages/WaterTransport/Admin_Water/Employees";
 import { RevenuePage } from "../pages/WaterTransport/Admin_Water/Revenue";
 import { BusesPage } from "../pages/GroundTransport/Admin_Ground/Bus";
+import { Baggage } from "../pages/AirTransport/UserUI_A/Baggage";
 import { BusEmployeePage } from "../pages/GroundTransport/Admin_Ground/Busemployee";
 import { BusRevenuePage } from "../pages/GroundTransport/Admin_Ground/BusRevenu";
 import { PlansPage } from "../pages/AirTransport/Admin_Air/Aircraft";
@@ -47,6 +50,7 @@ import AirAdmindashboard from "../pages/AirTransport/Admin_Air/AirAdmindashboard
 import UserdashBoardWater from "../pages/WaterTransport/Userinterface/UserdashBoardWater";
 import UserDashBoardAir from "../pages/AirTransport/UserUI_A/UserDashBoardAir";
 import UserDashboard from "../pages/GroundTransport/UserUI_G/UserDashboard";
+
 
 const PrivateRoutes = () => {
   const ProfilePage = lazy(() => import("../modules/profile/ProfilePage"));
@@ -135,6 +139,9 @@ const PrivateRoutes = () => {
         {/* AirTransport user  */}
 
         <Route path="/Air/Search" element={<SearchAir />} />
+        <Route path="/Air/MyBookings" element={<MyBooking />} />
+        <Route path="Air/Baggage" element={<Baggage/>} />
+        <Route path="/Air/faq" element={<FAQ />} />
         <Route path="/AirDetails" element={<AirDetailsPage />} />
         <Route path="/summaryAir" element={<SummaryAir />} />
         <Route path="/AirUserDashBoard" element={<UserDashBoardAir />} />
