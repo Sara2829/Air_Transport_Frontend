@@ -43,8 +43,28 @@ const AirCard: React.FC = () => {
   const handleBookNow = (plane: any) => {
     // Log the selected plane to ensure the correct data is passed
     console.log("Selected Plane:", plane);
-    navigate("/AirDetails", { state: plane });
+  
+    // Assuming you have access to the source, destination, and dates
+    const { source, destination, departure, arrival, price, flight_name, image, description, flight_class } = plane;
+  
+    // Collect all relevant details into an object
+    const bookingDetails = {
+      source,
+      destination,
+      departure,
+      arrival,
+      price,
+      flight_name,
+      image,
+      description,
+      flight_class,
+      // Add any other relevant data here
+    };
+  
+    // Navigate to the AirDetails page and pass the booking details as state
+    navigate("/AirDetails", { state: bookingDetails });
   };
+  
 
   if (isLoading) {
     return <div>Loading planes...</div>;
