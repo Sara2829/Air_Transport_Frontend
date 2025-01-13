@@ -121,7 +121,7 @@ const AppRoutingSetup = () => {
       <Route path="error/*" element={<ErrorsRouting />} />
       <Route path="auth/*" element={<AuthPage />} />
       {/* Fallback for unmatched routes */}
-      <Route path="*" element={<Navigate to="/error/404" />} />
+      {/* <Route path="*" element={<Navigate to="/error/404" />} /> */}
     </Routes>
     </ProfileProvider>
   );

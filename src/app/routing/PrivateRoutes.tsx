@@ -50,6 +50,7 @@ import AirAdmindashboard from "../pages/AirTransport/Admin_Air/AirAdmindashboard
 import UserdashBoardWater from "../pages/WaterTransport/Userinterface/UserdashBoardWater";
 import UserDashBoardAir from "../pages/AirTransport/UserUI_A/UserDashBoardAir";
 import UserDashboard from "../pages/GroundTransport/UserUI_G/UserDashboard";
+import PassengerEntryPage from "../pages/AirTransport/UserUI_A/PassengerEntryPage";
 
 
 const PrivateRoutes = () => {
@@ -139,6 +140,7 @@ const PrivateRoutes = () => {
         {/* AirTransport user  */}
 
         <Route path="/Air/Search" element={<SearchAir />} />
+        <Route path="/AirDetails/passengerEntry" element={<PassengerEntryPage />} />
         <Route path="/Air/MyBookings" element={<MyBooking />} />
         <Route path="Air/Baggage" element={<Baggage/>} />
         <Route path="/Air/faq" element={<FAQ />} />
@@ -196,7 +198,7 @@ const PrivateRoutes = () => {
           }
         /> */}
         {/* Page Not Found */}
-        <Route path="*" element={<Navigate to="/error/404" />} />
+        {/* <Route path="*" element={<Navigate to="/error/404" />} /> */}
       </Route>
     </Routes>
   );
