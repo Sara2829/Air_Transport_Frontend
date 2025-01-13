@@ -26,7 +26,7 @@ export function AsideMenuMainUpdatedAir() {
       <AsideMenuItem
         to="/Air/Employee"
         icon="element-11"
-        title="Employees"
+        title="Crew"
       />
       <AsideMenuItem to="Air/Revenue" icon="element-11" title="Revenue" />
       <AsideMenuItem to="Air/FAQ" icon="element-11" title="FAQ & Queries" />
