@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios"; // Import Axios for API calls
+import axios from "axios";
 
 const AirDetailsPage: React.FC = () => {
   const location = useLocation();
@@ -28,15 +28,28 @@ const AirDetailsPage: React.FC = () => {
         travellerCount,
       });
 
-      const bookingId = response.data.bookingId; // Assuming backend returns { bookingId }
+      // Log the full backend response for debugging
+      console.log("Booking Response:", response.data);
+
+      // Extract booking ID from the response
+      const bookingId = response.data.bookingId || response.data.id; // Adjust based on backend response
+      if (!bookingId) {
+        throw new Error("Booking ID not returned from backend.");
+      }
+
       console.log("Generated Booking ID:", bookingId);
 
       // Navigate to Passenger Entry page with flight details, travelers, and booking ID
       navigate("/AirDetails/passengerEntry", {
         state: { flightDetails, travellerCount, bookingId },
       });
-    } catch (error) {
-      console.error("Error creating booking:", error);
+    } catch (error: any) {
+      // Log error details
+      if (error.response) {
+        console.error("API Error Response:", error.response.data);
+      } else {
+        console.error("Error:", error.message);
+      }
       alert("Failed to create booking. Please try again.");
     }
   };
@@ -51,7 +64,10 @@ const AirDetailsPage: React.FC = () => {
           <div className="row">
             <div className="col-md-6">
               <img
-                src={flightDetails.image || "https://img.freepik.com/free-photo/planes-wing-cuts-through-sky-cotton-candy-clouds-radiant-sunset_91128-4456.jpg"}
+                src={
+                  flightDetails.image ||
+                  "https://img.freepik.com/free-photo/planes-wing-cuts-through-sky-cotton-candy-clouds-radiant-sunset_91128-4456.jpg"
+                }
                 alt={flightDetails.name}
                 className="img-fluid rounded-start"
                 style={{ height: "300px", objectFit: "cover" }}
@@ -60,9 +76,15 @@ const AirDetailsPage: React.FC = () => {
             <div className="col-md-6">
               <h5>{flightDetails.name}</h5>
               <p>{flightDetails.description}</p>
-              <p><strong>Price: ₹{flightDetails.price}</strong></p>
-              <p><strong>Source:</strong> {flightDetails.source}</p>
-              <p><strong>Destination:</strong> {flightDetails.destination}</p>
+              <p>
+                <strong>Price: ₹{flightDetails.price}</strong>
+              </p>
+              <p>
+                <strong>Source:</strong> {flightDetails.source}
+              </p>
+              <p>
+                <strong>Destination:</strong> {flightDetails.destination}
+              </p>
 
               <div className="mb-3">
                 <label>Number of Travelers</label>
@@ -75,7 +97,10 @@ const AirDetailsPage: React.FC = () => {
                 />
               </div>
 
-              <button className="btn btn-primary float-end" onClick={handleNavigateToPassengerEntry}>
+              <button
+                className="btn btn-primary float-end"
+                onClick={handleNavigateToPassengerEntry}
+              >
                 Proceed to Passenger Entry
               </button>
             </div>

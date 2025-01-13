@@ -4,7 +4,7 @@ import axios from "axios";
 
 const PassengerEntryPage: React.FC = () => {
   const location = useLocation();
-  const { flightDetails, numTravelers, bookingId } = location.state as {
+  const { flightDetails, bookingId } = location.state as {
     flightDetails: {
       name: string;
       image: string;
@@ -14,39 +14,47 @@ const PassengerEntryPage: React.FC = () => {
       destination: string;
       flightId: string;
     };
-    numTravelers: number;
-    bookingId: string;  // Booking ID received here
+    bookingId: string; // Booking ID received here
   };
 
-  const [passengerInfo, setPassengerInfo] = useState({ name: "", email: "", phone: "" });
+  const [passengerInfo, setPassengerInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
   const [passengers, setPassengers] = useState<any[]>([]);
   const navigate = useNavigate();
 
-  const handleAddPassenger = async () => {
-    const passenger = {
-      name: passengerInfo.name,
-      email: passengerInfo.email,
-      phone: passengerInfo.phone,
-      flightId: flightDetails.flightId,
-      bookingId,  // Pass the booking ID with the passenger details
-    };
+  const handleAddPassenger = () => {
+    // Add passenger to the local array
+    if (!passengerInfo.name || !passengerInfo.email || !passengerInfo.phone) {
+      alert("Please fill in all fields for the passenger.");
+      return;
+    }
 
-    console.log("Booking ID on PassengerEntry:", bookingId); // Log booking ID
+    setPassengers([...passengers, { ...passengerInfo }]);
+    setPassengerInfo({ name: "", email: "", phone: "" });
+  };
 
+  const handleSubmitPassengers = async () => {
     try {
-      const response = await axios.post("http://localhost:8080/passengers", passenger, {
-        headers: { "Content-Type": "application/json" },
-      });
+      // Send passengers array to the backend
+      const response = await axios.post(
+        `http://localhost:8080/passengers/add/${bookingId}`,
+        passengers,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-      setPassengers([...passengers, response.data]);
-      setPassengerInfo({ name: "", email: "", phone: "" });
+      console.log("Passengers successfully added:", response.data);
+      alert("Passengers successfully registered!");
 
-      if (passengers.length + 1 === numTravelers) {
-        alert("All passengers added successfully!");
-        navigate("/bookingSummary", { state: { flightDetails, passengers, bookingId } });
-      }
+      // Navigate to the summary page with relevant details
+      navigate("/bookingSummary", { state: { flightDetails, passengers, bookingId } });
     } catch (error) {
-      console.error("Error adding passenger:", error);
+      console.error("Error submitting passengers:", error);
+      alert("Failed to submit passengers. Please try again.");
     }
   };
 
@@ -95,8 +103,17 @@ const PassengerEntryPage: React.FC = () => {
           </div>
 
           {/* Add Passenger Button */}
-          <button className="btn btn-success" onClick={handleAddPassenger}>
+          <button className="btn btn-success me-2" onClick={handleAddPassenger}>
             Add Passenger
+          </button>
+
+          {/* Submit Passengers Button */}
+          <button
+            className="btn btn-primary"
+            onClick={handleSubmitPassengers}
+            disabled={passengers.length === 0}
+          >
+            Submit Passengers
           </button>
 
           {/* Passenger List */}
