@@ -51,7 +51,14 @@ const PassengerEntryPage: React.FC = () => {
       alert("Passengers successfully registered!");
 
       // Navigate to the summary page with relevant details
-      navigate("/bookingSummary", { state: { flightDetails, passengers, bookingId } });
+      navigate("/AirDetails/baggage", {
+        state: {
+          flightDetails,
+          passengers,
+          bookingId,
+          passengerCount: passengers.length, // Passing passenger count
+        },
+      });
     } catch (error) {
       console.error("Error submitting passengers:", error);
       alert("Failed to submit passengers. Please try again.");
