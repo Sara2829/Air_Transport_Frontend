@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios"; // Import Axios for API calls
 
 const AirDetailsPage: React.FC = () => {
   const location = useLocation();
@@ -10,18 +11,34 @@ const AirDetailsPage: React.FC = () => {
     price: number;
     source: string;
     destination: string;
+    flightId: string;
     gallery: string[];
   };
 
-  const [numTravelers, setNumTravelers] = useState<number>(1);
-
+  const [travellerCount, settravellerCount] = useState<number>(1);
   const navigate = useNavigate();
 
-  const handleNavigateToPassengerEntry = () => {
-    // Navigate to passenger entry page with flight details and number of travelers
-    navigate("/AirDetails/passengerEntry", {
-      state: { flightDetails, numTravelers },
-    });
+  const handleNavigateToPassengerEntry = async () => {
+    console.log("Flight ID:", flightDetails.flightId);
+    console.log("Number of Travelers:", travellerCount);
+    try {
+      // Call backend API to create a booking
+      const response = await axios.post("http://localhost:8080/bookings", {
+        flightId: flightDetails.flightId,
+        travellerCount,
+      });
+
+      const bookingId = response.data.bookingId; // Assuming backend returns { bookingId }
+      console.log("Generated Booking ID:", bookingId);
+
+      // Navigate to Passenger Entry page with flight details, travelers, and booking ID
+      navigate("/AirDetails/passengerEntry", {
+        state: { flightDetails, travellerCount, bookingId },
+      });
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      alert("Failed to create booking. Please try again.");
+    }
   };
 
   return (
@@ -34,70 +51,31 @@ const AirDetailsPage: React.FC = () => {
           <div className="row">
             <div className="col-md-6">
               <img
-                src={
-                  flightDetails.image ||
-                  "https://img.freepik.com/free-photo/planes-wing-cuts-through-sky-cotton-candy-clouds-radiant-sunset_91128-4456.jpg?t=st=1736572556~exp=1736576156~hmac=491d3d288ba194849824f090134a7ddc9f21134fbc65010773baf4bb616221a3&w=1380"
-                }
+                src={flightDetails.image || "https://img.freepik.com/free-photo/planes-wing-cuts-through-sky-cotton-candy-clouds-radiant-sunset_91128-4456.jpg"}
                 alt={flightDetails.name}
                 className="img-fluid rounded-start"
                 style={{ height: "300px", objectFit: "cover" }}
               />
             </div>
             <div className="col-md-6">
-              <h5 className="card-title">{flightDetails.name}</h5>
-              <p className="card-text">{flightDetails.description}</p>
-              <p className="card-text">
-                <strong>Price: ₹{flightDetails.price}</strong>
-              </p>
+              <h5>{flightDetails.name}</h5>
+              <p>{flightDetails.description}</p>
+              <p><strong>Price: ₹{flightDetails.price}</strong></p>
+              <p><strong>Source:</strong> {flightDetails.source}</p>
+              <p><strong>Destination:</strong> {flightDetails.destination}</p>
 
-              {/* Source and Destination */}
-              <p>
-                <strong>Source:</strong> {flightDetails.source}
-              </p>
-              <p>
-                <strong>Destination:</strong> {flightDetails.destination}
-              </p>
-
-              {/* Number of Travelers */}
               <div className="mb-3">
-                <label className="form-label">Number of Travelers</label>
+                <label>Number of Travelers</label>
                 <input
                   type="number"
                   className="form-control"
                   min="1"
-                  value={numTravelers}
-                  onChange={(e) => setNumTravelers(Number(e.target.value))}
+                  value={travellerCount}
+                  onChange={(e) => settravellerCount(Number(e.target.value))}
                 />
               </div>
 
-              {/* Gallery */}
-              <div>
-                <h3>Image Gallery</h3>
-                <div className="gallery">
-                  {flightDetails.gallery && flightDetails.gallery.length > 0 ? (
-                    <div className="row justify-content-start">
-                      {flightDetails.gallery.map((image, index) => (
-                        <div key={index} className="col-md-4 mb-3">
-                          <img
-                            src={image}
-                            alt={`Gallery Image ${index + 1}`}
-                            className="img-fluid"
-                            style={{ height: "200px", objectFit: "cover" }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p>No gallery images available.</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Save Booking Button */}
-              <button
-                className="btn btn-primary float-end"
-                onClick={handleNavigateToPassengerEntry}
-              >
+              <button className="btn btn-primary float-end" onClick={handleNavigateToPassengerEntry}>
                 Proceed to Passenger Entry
               </button>
             </div>

@@ -4,7 +4,7 @@ import axios from "axios";
 
 const PassengerEntryPage: React.FC = () => {
   const location = useLocation();
-  const { flightDetails, numTravelers } = location.state as {
+  const { flightDetails, numTravelers, bookingId } = location.state as {
     flightDetails: {
       name: string;
       image: string;
@@ -12,48 +12,38 @@ const PassengerEntryPage: React.FC = () => {
       price: number;
       source: string;
       destination: string;
+      flightId: string;
     };
     numTravelers: number;
+    bookingId: string;  // Booking ID received here
   };
 
-  const [passengerInfo, setPassengerInfo] = useState({
-    name: "",
-    email: "",
-    phone: "",
-  });
-
-  const [passengers, setPassengers] = useState<any[]>([]); // To keep track of added passengers
+  const [passengerInfo, setPassengerInfo] = useState({ name: "", email: "", phone: "" });
+  const [passengers, setPassengers] = useState<any[]>([]);
   const navigate = useNavigate();
 
   const handleAddPassenger = async () => {
-    // Create a passenger object
     const passenger = {
       name: passengerInfo.name,
       email: passengerInfo.email,
       phone: passengerInfo.phone,
-      flightName: flightDetails.name, // Associate with flight
+      flightId: flightDetails.flightId,
+      bookingId,  // Pass the booking ID with the passenger details
     };
 
+    console.log("Booking ID on PassengerEntry:", bookingId); // Log booking ID
+
     try {
-      // Make API request to add passenger
       const response = await axios.post("http://localhost:8080/passengers", passenger, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
-      console.log("Passenger added successfully:", response.data);
-
-      // Update the passenger list
       setPassengers([...passengers, response.data]);
-
-      // Clear input fields
       setPassengerInfo({ name: "", email: "", phone: "" });
 
-      // Check if all passengers are added
       if (passengers.length + 1 === numTravelers) {
         alert("All passengers added successfully!");
-        navigate("/bookingSummary", { state: { flightDetails, passengers } });
+        navigate("/bookingSummary", { state: { flightDetails, passengers, bookingId } });
       }
     } catch (error) {
       console.error("Error adding passenger:", error);
@@ -79,9 +69,7 @@ const PassengerEntryPage: React.FC = () => {
               type="text"
               className="form-control"
               value={passengerInfo.name}
-              onChange={(e) =>
-                setPassengerInfo({ ...passengerInfo, name: e.target.value })
-              }
+              onChange={(e) => setPassengerInfo({ ...passengerInfo, name: e.target.value })}
               placeholder="Enter passenger's name"
             />
           </div>
@@ -91,9 +79,7 @@ const PassengerEntryPage: React.FC = () => {
               type="email"
               className="form-control"
               value={passengerInfo.email}
-              onChange={(e) =>
-                setPassengerInfo({ ...passengerInfo, email: e.target.value })
-              }
+              onChange={(e) => setPassengerInfo({ ...passengerInfo, email: e.target.value })}
               placeholder="Enter passenger's email"
             />
           </div>
@@ -103,18 +89,13 @@ const PassengerEntryPage: React.FC = () => {
               type="text"
               className="form-control"
               value={passengerInfo.phone}
-              onChange={(e) =>
-                setPassengerInfo({ ...passengerInfo, phone: e.target.value })
-              }
+              onChange={(e) => setPassengerInfo({ ...passengerInfo, phone: e.target.value })}
               placeholder="Enter passenger's phone number"
             />
           </div>
 
           {/* Add Passenger Button */}
-          <button
-            className="btn btn-success"
-            onClick={handleAddPassenger}
-          >
+          <button className="btn btn-success" onClick={handleAddPassenger}>
             Add Passenger
           </button>
 
