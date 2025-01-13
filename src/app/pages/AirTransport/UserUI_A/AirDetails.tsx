@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios"; // Make sure axios is installed
 
 const AirDetailsPage: React.FC = () => {
   const location = useLocation();
-  const cruise = location.state as {
+  const flightDetails = location.state as {
     name: string;
     image: string;
     description: string;
-    rating: number;
     price: number;
-    gallery: string[]; // Array of image URLs
+    source: string;
+    destination: string;
+    travelDate: string;
+    gallery: string[];
   };
 
-  const [travelDate, setTravelDate] = useState<string>("");
+  const [travelDate, setTravelDate] = useState<string>(flightDetails.travelDate || "");
   const [numTravelers, setNumTravelers] = useState<number>(1);
 
   // State for user information
@@ -24,15 +27,31 @@ const AirDetailsPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleSaveBooking = () => {
-    const bookingDetails = {
-      cruise,
-      travelDate,
-      numTravelers,
-      userInfo,
+  const handleSaveBooking = async () => {
+    // Create BookingDTO object
+    const bookingDTO = {
+      passengerName: userInfo.name,
+      flightName: flightDetails.name,
+      bookingDate: new Date().toISOString(),  // current date as booking date
+      travelDate,  // travel date from state
+      status: "Pending", // Status can be "Pending" initially or based on your needs
     };
-    // Navigate to Summary Page with state
-    navigate("/summaryAir", { state: bookingDetails });
+
+    try {
+      // Make API request to create booking
+      const response = await axios.post("http://localhost:8080/bookings", bookingDTO, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Booking created successfully:", response.data);
+
+      // Navigate to summary page (optional)
+      navigate("/summaryAir", { state: bookingDTO });
+    } catch (error) {
+      console.error("Error creating booking:", error);
+    }
   };
 
   return (
@@ -45,18 +64,22 @@ const AirDetailsPage: React.FC = () => {
           <div className="row">
             <div className="col-md-6">
               <img
-                src={cruise.image}
-                alt={cruise.name}
+                src={flightDetails.image || "https://img.freepik.com/free-photo/planes-wing-cuts-through-sky-cotton-candy-clouds-radiant-sunset_91128-4456.jpg?t=st=1736572556~exp=1736576156~hmac=491d3d288ba194849824f090134a7ddc9f21134fbc65010773baf4bb616221a3&w=1380"}
+                alt={flightDetails.name}
                 className="img-fluid rounded-start"
                 style={{ height: "300px", objectFit: "cover" }}
               />
             </div>
             <div className="col-md-6">
-              <h5 className="card-title">{cruise.name}</h5>
-              <p className="card-text">{cruise.description}</p>
+              <h5 className="card-title">{flightDetails.name}</h5>
+              <p className="card-text">{flightDetails.description}</p>
               <p className="card-text">
-                <strong>Price: ₹{cruise.price}</strong>
+                <strong>Price: ₹{flightDetails.price}</strong>
               </p>
+
+              {/* Source and Destination */}
+              <p><strong>Source:</strong> {flightDetails.source}</p>
+              <p><strong>Destination:</strong> {flightDetails.destination}</p>
 
               {/* User Information */}
               <div>
@@ -102,39 +125,13 @@ const AirDetailsPage: React.FC = () => {
 
               {/* Date Selection */}
               <div className="mb-3">
-                <label className="form-label">Check-in Date</label>
+                <label className="form-label">Travel Date</label>
                 <input
                   type="date"
                   className="form-control"
                   value={travelDate}
                   onChange={(e) => setTravelDate(e.target.value)}
                 />
-                <label className="form-label">Check-out Date</label>
-                <input
-                  type="date"
-                  className="form-control"
-                  value={travelDate}
-                  onChange={(e) => setTravelDate(e.target.value)}
-                />
-              </div>
-
-              {/* Amenities */}
-              <div>
-                <h3>Amenities</h3>
-                <ul
-                  style={{
-                    listStyleType: "none",
-                    padding: 0,
-                    display: "flex",
-                    gap: "10px",
-                  }}
-                >
-                  <li>Restaurant</li>
-                  <li>Indoor games</li>
-                  <li>Free parking</li>
-                  <li>Dining Area</li>
-                  <li>Air conditioning</li>
-                </ul>
               </div>
 
               {/* Number of Travelers */}
@@ -153,9 +150,9 @@ const AirDetailsPage: React.FC = () => {
               <div>
                 <h3>Image Gallery</h3>
                 <div className="gallery">
-                  {cruise.gallery && cruise.gallery.length > 0 ? (
+                  {flightDetails.gallery && flightDetails.gallery.length > 0 ? (
                     <div className="row justify-content-start">
-                      {cruise.gallery.map((image, index) => (
+                      {flightDetails.gallery.map((image, index) => (
                         <div key={index} className="col-md-4 mb-3">
                           <img
                             src={image}
