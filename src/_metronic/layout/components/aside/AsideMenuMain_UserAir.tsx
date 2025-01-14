@@ -19,7 +19,7 @@ export function AsideMenuMainUpdatedAirUser() {
       <AsideMenuItem to="Air/Homepage" icon="element-11" title="BookNow" />
       <AsideMenuItem to="Air/MyBookings" icon="element-11" title="My Bookings" />
       <AsideMenuItem to="Air/Baggage" icon="element-11" title="Baggage" />
-      <AsideMenuItem to="Air/faq" icon="element-11" title="FAQ" />
+      {/* <AsideMenuItem to="Air/faq" icon="element-11" title="FAQ" /> */}
       {/* <AsideMenuItem to="/Air/Users" icon="element-11" title="Users" /> */}
       <div className="menu-item">
         {/* <div className='menu-content pt-8 pb-2'>
