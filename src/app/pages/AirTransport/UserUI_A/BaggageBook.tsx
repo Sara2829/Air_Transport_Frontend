@@ -47,6 +47,15 @@ const BaggageBook: React.FC = () => {
       console.log("Baggage successfully added:", response.data);
       alert("Baggage successfully added!");
 
+       // Store baggage details in local storage
+       const baggageDetails = {
+        bookingId,
+        weight: parseFloat(weight),
+        bagCount: parseInt(bagCount, 10),
+        flightDetails,
+      };
+      localStorage.setItem("baggageDetails", JSON.stringify(baggageDetails));
+
       // Navigate to the Payment page with necessary details, including price
       navigate("/payment/confirmation", {
         state: {

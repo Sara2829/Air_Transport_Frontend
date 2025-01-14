@@ -100,7 +100,7 @@ export const AirEmployeePage: React.FC = () => {
               <option value="">All</option>
               <option value="PILOT">Pilot</option>
               <option value="CABIN_CREW">Cabin Crew</option>
-              <option value="GROUND_CREW">Ground Crew</option>
+              <option value="GROUND_STAFF">Ground Staff</option>
             </select>
           </div>
 
@@ -208,7 +208,7 @@ export const AirEmployeePage: React.FC = () => {
                       <option value="">Select Role</option>
                       <option value="PILOT">Pilot</option>
                       <option value="CABIN_CREW">Cabin Crew</option>
-                      <option value="GROUND_CREW">Ground Crew</option>
+                      <option value="GROUND_STAFF">Ground Staff</option>
                     </select>
                   </div>
                   <div className="mb-3">

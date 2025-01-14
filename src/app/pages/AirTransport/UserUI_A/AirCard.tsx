@@ -101,6 +101,10 @@ const AirCard: React.FC = () => {
             borderRadius: "8px",
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
             height: "fit-content",
+            position: "sticky", // Make it sticky
+            top: "100px", // Adjusted to push it down more
+            maxHeight: "calc(100vh - 100px)", // Adjusted to match the new top value
+            overflowY: "auto", // Allow scrolling inside the filter if needed
           }}
         >
           <h4 style={{ marginBottom: "1rem", fontWeight: "bold", color: "#333" }}>Filters</h4>
@@ -182,7 +186,22 @@ const AirCard: React.FC = () => {
                 style={{ width: "100%", height: "200px", objectFit: "cover" }}
               />
               <div style={{ padding: "1rem" }}>
-                <h3 style={{ marginBottom: "0.5rem", fontSize: "1.25rem" }}>{plane.name}</h3>
+                <h3 style={{ marginBottom: "0.5rem", fontSize: "1.25rem" }}>{plane.flightName}</h3>
+                <p style={{ marginBottom: "0.5rem", color: "#555" }}>
+                  <strong>Airline:</strong> {plane.airline}
+                </p>
+                <p style={{ marginBottom: "0.5rem", color: "#555" }}>
+                  <strong>Departure:</strong> {new Date(plane.departure).toLocaleString()}
+                </p>
+                <p style={{ marginBottom: "0.5rem", color: "#555" }}>
+                  <strong>Arrival:</strong> {new Date(plane.arrival).toLocaleString()}
+                </p>
+                <p style={{ marginBottom: "1rem", color: "#555" }}>
+                  <strong>Flight Class:</strong> {plane.flightClass}
+                </p>
+                <p style={{ marginBottom: "1rem", color: "#555" }}>
+                  <strong>Description:</strong> {plane.description || "No description available."}
+                </p>
                 <p style={{ marginBottom: "1rem", color: "#555" }}>
                   <strong>Price:</strong> ₹{plane.price}
                 </p>

@@ -39,6 +39,10 @@ const AirDetailsPage: React.FC = () => {
 
       console.log("Generated Booking ID:", bookingId);
 
+      // Store booking ID and flight details in local storage
+      localStorage.setItem("bookingId", bookingId);
+      localStorage.setItem("flightDetails", JSON.stringify(flightDetails));
+
       // Navigate to Passenger Entry page with flight details, travelers, and booking ID
       navigate("/AirDetails/passengerEntry", {
         state: { flightDetails, travellerCount, bookingId },

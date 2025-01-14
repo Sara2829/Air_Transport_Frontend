@@ -13,7 +13,7 @@ function SearchAir() {
         
 
         {/* Cruise Page content on the right */}
-        <div style={{ width: "70%" }}>
+        <div style={{ width: "100%" }}>
           <AirCard />
         </div>
       </div>
