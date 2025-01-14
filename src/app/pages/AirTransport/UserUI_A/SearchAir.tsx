@@ -10,9 +10,7 @@ function SearchAir() {
       {/* Main container with Flexbox layout */}
       <div className="d-flex mt-4">
         {/* Filter Panel on the left */}
-        <div style={{ width: "30%" }}>
-          <FilterpanelAir />
-        </div>
+        
 
         {/* Cruise Page content on the right */}
         <div style={{ width: "70%" }}>

@@ -1,12 +1,63 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-const FilterpanelAir: React.FC = () => {
+const FilterpanelAir: React.FC<{ onFilterApply: (filteredFlights: any[]) => void }> = ({
+  onFilterApply,
+}) => {
+  const [selectedAirlines, setSelectedAirlines] = useState<string[]>([]);
+  const [selectedRatings, setSelectedRatings] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(0);
+  const [error, setError] = useState<string>("");
 
-  const handleFilterSubmit = (e: React.FormEvent) => {
+  const handleAirlineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setSelectedAirlines((prev) =>
+      checked ? [...prev, value] : prev.filter((airline) => airline !== value)
+    );
+  };
+
+  const handleRatingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    setSelectedRatings((prev) =>
+      checked ? [...prev, value] : prev.filter((rating) => rating !== value)
+    );
+  };
+
+  const handleFilterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle the filter logic
+
+    if (selectedAirlines.length === 0 && selectedRatings.length === 0 && minPrice === 0 && maxPrice === 0) {
+      setError("Please select at least one filter.");
+      return;
+    }
+
+    setError("");
+
+    try {
+      const filteredFlights: any[] = [];
+      if (selectedAirlines.length > 0) {
+        for (const airline of selectedAirlines) {
+          const response = await axios.get(`http://localhost:8080/flights/airline/${airline}`);
+          console.log("Response:", response.data);
+          filteredFlights.push(...response.data);
+        }
+      }
+
+      // Additional filtering logic for ratings and price range can be applied here
+      const finalFilteredFlights = filteredFlights.filter((flight) => {
+        const matchesRating = selectedRatings.length > 0
+          ? selectedRatings.includes(flight.rating)
+          : true;
+        const matchesPrice = (minPrice === 0 || flight.price >= minPrice) &&
+          (maxPrice === 0 || flight.price <= maxPrice);
+        return matchesRating && matchesPrice;
+      });
+
+      onFilterApply(finalFilteredFlights);
+    } catch (err) {
+      setError("Error fetching filtered flights. Please try again.");
+    }
   };
 
   // Inline CSS styles
@@ -85,115 +136,85 @@ const FilterpanelAir: React.FC = () => {
               Airlines
             </h5>
             <ul className="filterList list-unstyled">
-              <li>
-                <input type="checkbox" id="vistara" aria-label="vistara" value="vistara" />
-                <label htmlFor="vistara" className="filter-label" style={styles.filterLabel}>
-                  Vistara
-                </label>
-              </li>
-              <li>
-                <input type="checkbox" id="Spice-jet" aria-label="Spice-jet" value="Spice-jet" />
-                <label htmlFor="Spice-jet" className="filter-label" style={styles.filterLabel}>
-                  Spice-jet
-                </label>
-              </li>
-              <li>
-                <input type="checkbox" id="family" aria-label="Family" value="Family" />
-                <label htmlFor="Indidgo" className="filter-label" style={styles.filterLabel}>
-                  Indigo
-                </label>
-              </li>
-              <li>
-                <input type="checkbox" id="five-star" aria-label="5-Star" value="5-Star" />
-                <label htmlFor="five-star" className="filter-label" style={styles.filterLabel}>
-                  5-Star
-                </label>
-              </li>
+              {["Vistara", "Spice-jet", "Indigo", "5-Star"].map((airline) => (
+                <li key={airline}>
+                  <input
+                    type="checkbox"
+                    id={airline}
+                    value={airline}
+                    onChange={handleAirlineChange}
+                  />
+                  <label htmlFor={airline} className="filter-label" style={styles.filterLabel}>
+                    {airline}
+                  </label>
+                </li>
+              ))}
             </ul>
 
             <h5 className="font-weight-bold mb-3 filter-section-title" style={styles.sectionTitle}>
               Price Range
             </h5>
-            <ul className="filterList list-unstyled">
-              <li>
-                <input type="checkbox" id="under-2000" aria-label="Under 2000" value="Under 2000" />
-                <label htmlFor="under-2000" className="filter-label" style={styles.filterLabel}>
-                  Under ₹2000
-                </label>
-              </li>
-              <li>
-                <input type="checkbox" id="2000-6000" aria-label="2000 - 6000" value="2000 - 6000" />
-                <label htmlFor="2000-6000" className="filter-label" style={styles.filterLabel}>
-                  ₹2000 - ₹6000
-                </label>
-              </li>
-              <li>
-                <input type="checkbox" id="custom-budget" aria-label="Custom Budget" value="Custom Budget" />
-                <div className="custom-budget-section" style={styles.customBudgetSection}>
-                  <h4 className="filter-section-title" style={styles.sectionTitle}>
-                    Your Budget
-                  </h4>
-                  <div className="d-flex" style={styles.dFlex}>
-                    <div className="d-flex flex-column mr-3" style={styles.mr3}>
-                      <label className="filter-input-label" style={styles.filterInputLabel}>
-                        Min:
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="₹ Min"
-                        className="form-control form-control-sm"
-                        value={minPrice}
-                        onChange={(e) => setMinPrice(Number(e.target.value))}
-                      />
-                    </div>
-                    <div className="d-flex flex-column">
-                      <label className="filter-input-label" style={styles.filterInputLabel}>
-                        Max:
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="₹ Max"
-                        className="form-control form-control-sm"
-                        value={maxPrice}
-                        onChange={(e) => setMaxPrice(Number(e.target.value))}
-                      />
-                    </div>
-                  </div>
+            <div className="custom-budget-section" style={styles.customBudgetSection}>
+              <div className="d-flex" style={styles.dFlex}>
+                <div className="d-flex flex-column mr-3" style={styles.mr3}>
+                  <label className="filter-input-label" style={styles.filterInputLabel}>
+                    Min:
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="₹ Min"
+                    className="form-control form-control-sm"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(Number(e.target.value))}
+                  />
                 </div>
-              </li>
-            </ul>
+                <div className="d-flex flex-column">
+                  <label className="filter-input-label" style={styles.filterInputLabel}>
+                    Max:
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="₹ Max"
+                    className="form-control form-control-sm"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  />
+                </div>
+              </div>
+            </div>
 
             <h5 className="font-weight-bold mb-3 filter-section-title" style={styles.sectionTitle}>
               Rating
             </h5>
             <ul className="filterList list-unstyled">
-              <li>
-                <input type="checkbox" id="very-good" aria-label="Very Good" value="Very Good" />
-                <label htmlFor="very-good" className="filter-label" style={styles.filterLabel}>
-                  Very Good
-                </label>
-              </li>
-              <li>
-                <input type="checkbox" id="good" aria-label="Good" value="Good" />
-                <label htmlFor="good" className="filter-label" style={styles.filterLabel}>
-                  Good
-                </label>
-              </li>
-              <li>
-                <input type="checkbox" id="better" aria-label="Better" value="Better" />
-                <label htmlFor="better" className="filter-label" style={styles.filterLabel}>
-                  Better
-                </label>
-              </li>
+              {["Very Good", "Good", "Better"].map((rating) => (
+                <li key={rating}>
+                  <input
+                    type="checkbox"
+                    id={rating}
+                    value={rating}
+                    onChange={handleRatingChange}
+                  />
+                  <label htmlFor={rating} className="filter-label" style={styles.filterLabel}>
+                    {rating}
+                  </label>
+                </li>
+              ))}
             </ul>
+
+            {error && <div className="text-danger text-center">{error}</div>}
 
             <div className="mb-3 text-center">
               <button
                 type="submit"
                 className="btn btn-primary filter-btn"
                 style={styles.filterBtn}
-                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = styles.filterBtnHover.backgroundColor)}
-                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = styles.filterBtn.backgroundColor)}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = styles.filterBtnHover.backgroundColor)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = styles.filterBtn.backgroundColor)
+                }
               >
                 Apply Filters
               </button>
