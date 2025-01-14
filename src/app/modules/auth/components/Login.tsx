@@ -420,7 +420,7 @@ const Login: React.FC = () => {
                 <p style={{fontSize: "14px"}}>
                     Don't have an account?{" "}
                     <a
-                        href="registration"
+                        href="auth/registration"
                         style={{
                             color: "#007bff",
                             textDecoration: "none",
