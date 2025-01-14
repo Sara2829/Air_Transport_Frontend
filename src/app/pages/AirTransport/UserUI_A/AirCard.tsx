@@ -11,8 +11,7 @@ const AirCard: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [selectedAirlines, setSelectedAirlines] = useState<string[]>([]);
-  const [minPrice, setMinPrice] = useState<number>(0);
-  const [maxPrice, setMaxPrice] = useState<number>(0);
+  const [sortByPrice, setSortByPrice] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,24 +37,14 @@ const AirCard: React.FC = () => {
         setFilteredPlanes(response.data); // Set the initial filtered list
         setIsLoading(false);
       })
-      .catch((error) => {
+      .catch(() => {
         setError("Error fetching plane data. Please try again later.");
         setIsLoading(false);
       });
   }, [source, destination, departureDate, returnDate, numPassengers, travelClass]);
 
-  const applyFilters = () => {
-    const filtered = planes.filter((plane) => {
-      const matchesAirline =
-        selectedAirlines.length > 0 ? selectedAirlines.includes(plane.airline) : true;
-      const matchesPrice =
-        (minPrice === 0 || plane.price >= minPrice) &&
-        (maxPrice === 0 || plane.price <= maxPrice);
-
-      return matchesAirline && matchesPrice;
-    });
-
-    setFilteredPlanes(filtered);
+  const handleSortByPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSortByPrice(e.target.checked);
   };
 
   const handleAirlineChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,13 +54,22 @@ const AirCard: React.FC = () => {
     );
   };
 
-  const handlePriceChange = (type: "min" | "max", value: number) => {
-    if (type === "min") setMinPrice(value);
-    if (type === "max") setMaxPrice(value);
+  const applyFilters = () => {
+    let filtered = planes.filter((plane) => {
+      const matchesAirline =
+        selectedAirlines.length > 0 ? selectedAirlines.includes(plane.airline) : true;
+      return matchesAirline;
+    });
+
+    if (sortByPrice) {
+      filtered = filtered.sort((a, b) => a.price - b.price);
+    }
+
+    setFilteredPlanes(filtered);
   };
 
   const handleBookNow = (plane: any) => {
-    const { source, destination, departure, arrival, price, flight_name, image, description, flight_class, flightId } = plane;
+    const { source, destination, departure, arrival, price, flightName, image, description, flightClass, flightId } = plane;
 
     const bookingDetails = {
       source,
@@ -79,10 +77,10 @@ const AirCard: React.FC = () => {
       departure,
       arrival,
       price,
-      flight_name,
+      flightName,
       image,
       description,
-      flight_class,
+      flightClass,
       flightId,
     };
     navigate("/AirDetails", { state: bookingDetails });
@@ -124,34 +122,18 @@ const AirCard: React.FC = () => {
             ))}
           </div>
           <div>
-            <h5 style={{ marginBottom: "0.5rem", color: "#555" }}>Price Range</h5>
+            <h5 style={{ marginBottom: "0.5rem", color: "#555" }}>Sort by</h5>
             <div style={{ marginBottom: "0.5rem" }}>
-              <label style={{ marginRight: "0.5rem", color: "#666" }}>Min Price:</label>
               <input
-                type="number"
-                value={minPrice}
-                onChange={(e) => handlePriceChange("min", Number(e.target.value))}
-                style={{
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  width: "100px",
-                }}
+                type="checkbox"
+                id="sortByPrice"
+                checked={sortByPrice}
+                onChange={handleSortByPriceChange}
+                style={{ marginRight: "0.5rem" }}
               />
-            </div>
-            <div>
-              <label style={{ marginRight: "0.5rem", color: "#666" }}>Max Price:</label>
-              <input
-                type="number"
-                value={maxPrice}
-                onChange={(e) => handlePriceChange("max", Number(e.target.value))}
-                style={{
-                  padding: "0.5rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  width: "100px",
-                }}
-              />
+              <label htmlFor="sortByPrice" style={{ color: "#666" }}>
+                Price
+              </label>
             </div>
           </div>
           <button
@@ -174,9 +156,10 @@ const AirCard: React.FC = () => {
         <div
           style={{
             flex: "3",
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            display: "flex",
+            flexWrap: "wrap",
             gap: "1.5rem",
+            justifyContent: "center",
           }}
         >
           {filteredPlanes.map((plane, index) => (
@@ -186,6 +169,8 @@ const AirCard: React.FC = () => {
                 backgroundColor: "#fff",
                 borderRadius: "8px",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                width: "300px",
+                overflow: "hidden",
               }}
             >
               <img
@@ -197,9 +182,8 @@ const AirCard: React.FC = () => {
                 style={{ width: "100%", height: "200px", objectFit: "cover" }}
               />
               <div style={{ padding: "1rem" }}>
-                <h3>{plane.name}</h3>
-                <p>{plane.description}</p>
-                <p>
+                <h3 style={{ marginBottom: "0.5rem", fontSize: "1.25rem" }}>{plane.name}</h3>
+                <p style={{ marginBottom: "1rem", color: "#555" }}>
                   <strong>Price:</strong> ₹{plane.price}
                 </p>
                 <button
