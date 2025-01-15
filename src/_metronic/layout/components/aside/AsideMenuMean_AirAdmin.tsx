@@ -28,8 +28,8 @@ export function AsideMenuMainUpdatedAir() {
         icon="element-11"
         title="Crew"
       />
-      <AsideMenuItem to="Air/Revenue" icon="element-11" title="Revenue" />
-      <AsideMenuItem to="Air/FAQ" icon="element-11" title="FAQ & Queries" />
+      {/* <AsideMenuItem to="Air/Revenue" icon="element-11" title="Revenue" />
+      <AsideMenuItem to="Air/FAQ" icon="element-11" title="FAQ & Queries" /> */}
     </>
   );
 }
