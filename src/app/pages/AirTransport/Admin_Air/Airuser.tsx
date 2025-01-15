@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Pagination from "../../Pagination";
-import AddAirUser from "./AddUser"; // Import AddAirUser modal
-
-
+import AddAirUser from "./AddUser"; // AddAirUser modal
 
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
 export const AirUserPage: React.FC = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]); // Updated type to any[] for more flexibility
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(5);
   const [search, setSearch] = useState("");
@@ -69,7 +67,6 @@ export const AirUserPage: React.FC = () => {
             value={search}
             onChange={handleSearchChange}
           />
-
           <button
             type="button"
             className="btn btn-light-primary border-0 rounded mx-2"
@@ -89,7 +86,7 @@ export const AirUserPage: React.FC = () => {
               <tr className="fw-bold fs-6 text-gray-800 border-bottom border-gray-200">
                 <th>Username</th>
                 <th>Email</th>
-                <th>Actions</th>
+                <th>Password</th>
               </tr>
             </thead>
             <tbody>
@@ -99,45 +96,7 @@ export const AirUserPage: React.FC = () => {
                   <tr key={user.id}>
                     <td>{user.username}</td>
                     <td>{user.email}</td>
-                    <td className="text-center">
-                      <div className="d-flex flex-row align-items-center">
-                        <button
-                          className="btn btn-icon btn-bg-light btn-sm me-1"
-                          // View button functionality
-                        >
-                          <i className="ki-duotone ki-eye fs-3 text-primary">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                            <span className="path3"></span>
-                          </i>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
-                          // Edit button functionality
-                        >
-                          <i className="ki-duotone ki-pencil fs-3 text-primary">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                          </i>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
-                          // Delete button functionality
-                        >
-                          <i className="ki-duotone ki-trash fs-3 text-danger">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                            <span className="path3"></span>
-                            <span className="path4"></span>
-                            <span className="path5"></span>
-                          </i>
-                        </button>
-                      </div>
-                    </td>
+                    <td>{user.password ? user.password : "Not Provided"}</td>
                   </tr>
                 ))}
             </tbody>

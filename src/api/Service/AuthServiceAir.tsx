@@ -10,6 +10,7 @@ export const AirService = {
         `${API_URL}/auth/login`,
         loginData
       );
+      console.log("Air login response:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error during Air login:", error);

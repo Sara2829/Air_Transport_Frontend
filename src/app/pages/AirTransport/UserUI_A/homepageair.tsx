@@ -1,7 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-const AirHomePage = () => {
+
+const AirHomePage: React.FC = () => {
+  const [source, setSource] = useState("");
+  const [destination, setDestination] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [numPassengers, setNumPassengers] = useState("");
+  const [travelClass, setTravelClass] = useState("economy");
   const navigate = useNavigate();
+
+  const handleSearch = () => {
+    // Log the search parameters to the console
+    console.log("Search Parameters:", {
+      source,
+      destination,
+      departureDate,
+      returnDate,
+      numPassengers,
+      travelClass,
+    });
+
+    // Pass search parameters to AirCard page
+    navigate("/Air/Search", {
+      state: {
+        source,
+        destination,
+        departureDate,
+        returnDate,
+        numPassengers,
+        travelClass,
+      },
+    });
+  };
 
   return (
     <div className="container mt-4">
@@ -14,27 +45,31 @@ const AirHomePage = () => {
           <div className="row align-items-end">
             {/* Source Airport */}
             <div className="col-md-2">
-              <label htmlFor="sourceAirport" className="form-label">
+              <label htmlFor="source" className="form-label">
                 Source Airport
               </label>
               <input
                 type="text"
-                id="sourceAirport"
+                id="source"
                 className="form-control"
                 placeholder="Enter Source Airport"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
               />
             </div>
 
             {/* Destination Airport */}
             <div className="col-md-2">
-              <label htmlFor="destinationAirport" className="form-label">
+              <label htmlFor="destination" className="form-label">
                 Destination Airport
               </label>
               <input
                 type="text"
-                id="destinationAirport"
+                id="destination"
                 className="form-control"
                 placeholder="Enter Destination Airport"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
               />
             </div>
 
@@ -43,7 +78,13 @@ const AirHomePage = () => {
               <label htmlFor="departureDate" className="form-label">
                 Departure Date
               </label>
-              <input type="date" id="departureDate" className="form-control" />
+              <input
+                type="date"
+                id="departureDate"
+                className="form-control"
+                value={departureDate}
+                onChange={(e) => setDepartureDate(e.target.value)}
+              />
             </div>
 
             {/* Return Date */}
@@ -51,7 +92,13 @@ const AirHomePage = () => {
               <label htmlFor="returnDate" className="form-label">
                 Return Date (Optional)
               </label>
-              <input type="date" id="returnDate" className="form-control" />
+              <input
+                type="date"
+                id="returnDate"
+                className="form-control"
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+              />
             </div>
 
             {/* Number of Passengers */}
@@ -63,7 +110,8 @@ const AirHomePage = () => {
                 type="number"
                 id="numPassengers"
                 className="form-control"
-                placeholder="Number of Passengers"
+                value={numPassengers}
+                onChange={(e) => setNumPassengers(e.target.value)}
               />
             </div>
 
@@ -72,7 +120,12 @@ const AirHomePage = () => {
               <label htmlFor="travelClass" className="form-label">
                 Travel Class
               </label>
-              <select id="travelClass" className="form-select">
+              <select
+                id="travelClass"
+                className="form-select"
+                value={travelClass}
+                onChange={(e) => setTravelClass(e.target.value)}
+              >
                 <option value="economy">Economy</option>
                 <option value="business">Business</option>
                 <option value="firstClass">First Class</option>
@@ -81,66 +134,9 @@ const AirHomePage = () => {
 
             {/* Search Button */}
             <div className="col-md-12 mt-12 d-flex justify-content-end">
-              <button
-                className="btn btn-primary"
-                onClick={() => navigate("/Air/Search")}
-              >
+              <button className="btn btn-primary" onClick={handleSearch}>
                 Search
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Discounts Section */}
-        <div className="card mt-4">
-          <h1>Exclusive Flight Deals</h1>
-          <div className="row">
-            {/* First Card */}
-            <div className="col-md-4 mb-4">
-              <div
-                className="bg-light-info px-6 py-8 rounded-2 me-7"
-                style={{ width: "200px" }}
-              >
-                <i className="ki-duotone ki-abstract-26 fs-3x text-info d-block my-2">
-                  <span className="path1"></span>
-                  <span className="path2"></span>
-                </i>
-                <a href="#" className="text-info fw-semibold fs-6 mt-2">
-                  15% Off International Flights
-                </a>
-              </div>
-            </div>
-
-            {/* Second Card */}
-            <div className="col-md-4 mb-4">
-              <div
-                className="bg-light-info px-6 py-8 rounded-2 me-7"
-                style={{ width: "200px" }}
-              >
-                <i className="ki-duotone ki-abstract-26 fs-3x text-info d-block my-2">
-                  <span className="path1"></span>
-                  <span className="path2"></span>
-                </i>
-                <a href="#" className="text-info fw-semibold fs-6 mt-2">
-                  20% Off Domestic Flights
-                </a>
-              </div>
-            </div>
-
-            {/* Third Card */}
-            <div className="col-md-4 mb-4">
-              <div
-                className="bg-light-info px-6 py-8 rounded-2 me-7"
-                style={{ width: "200px" }}
-              >
-                <i className="ki-duotone ki-abstract-26 fs-3x text-info d-block my-2">
-                  <span className="path1"></span>
-                  <span className="path2"></span>
-                </i>
-                <a href="#" className="text-info fw-semibold fs-6 mt-2">
-                  25% Off on Group Bookings
-                </a>
-              </div>
             </div>
           </div>
         </div>

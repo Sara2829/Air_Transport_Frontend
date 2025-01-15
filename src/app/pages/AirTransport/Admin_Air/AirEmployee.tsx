@@ -1,26 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Pagination from "../../Pagination";
-// import AddAirEmployee from "./AddAirEmployee";
+import axios from "axios";
 
-// Example static data for air employees
-const mockAirEmployees = [
-  { id: 1, name: "Emily Davis", age: 35, role: "Pilot", salary: 80000, active: true },
-  { id: 2, name: "Michael Brown", age: 28, role: "Flight Attendant", salary: 40000, active: true },
-  { id: 3, name: "Sarah Wilson", age: 32, role: "Ground Crew", salary: 35000, active: false },
-  { id: 4, name: "David Lee", age: 45, role: "Pilot", salary: 90000, active: true },
-];
+const API_URL = import.meta.env.VITE_APP_API_URL;
 
 export const AirEmployeePage: React.FC = () => {
-  const [employees, setEmployees] = useState(mockAirEmployees);
+  const [employees, setEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(5);
   const [search, setSearch] = useState("");
   const [showAddEmployeeModal, setShowAddEmployeeModal] = useState(false);
+  const [showEditEmployeeModal, setShowEditEmployeeModal] = useState(false);
   const [roleFilter, setRoleFilter] = useState("");
+  const [newCrew, setNewCrew] = useState({
+    name: "",
+    role: "",
+    availability: true,
+    adminId: 1,
+  });
+  const [editCrew, setEditCrew] = useState({
+    id: "",
+    name: "",
+    role: "",
+    availability: true,
+  });
 
-  const filteredEmployees = employees.filter((employee) =>
-    employee.name.toLowerCase().includes(search.toLowerCase()) &&
-    (roleFilter ? employee.role === roleFilter : true)
+  // Fetch crew data on mount
+  useEffect(() => {
+    fetchCrewData();
+  }, []);
+
+  const fetchCrewData = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/crew-management/all"
+      );
+      setEmployees(response.data);
+    } catch (error) {
+      console.error("Failed to fetch crew data:", error);
+    }
+  };
+
+  const filteredEmployees = employees.filter(
+    (employee: any) =>
+      employee.name.toLowerCase().includes(search.toLowerCase()) &&
+      (roleFilter ? employee.role === roleFilter : true)
   );
 
   const handlePageChange = (page: number) => setCurrentPage(page);
@@ -39,17 +63,45 @@ export const AirEmployeePage: React.FC = () => {
   const handleRoleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
     setRoleFilter(e.target.value);
 
-  const toggleActiveStatus = (id: number) => {
-    setEmployees(
-      employees.map((employee) =>
-        employee.id === id ? { ...employee, active: !employee.active } : employee
-      )
-    );
+  const handleAddCrewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axios.post("http://localhost:8080/crew-management", newCrew);
+      alert("New crew added successfully!");
+      setShowAddEmployeeModal(false);
+      setNewCrew({ name: "", role: "", availability: true, adminId: 1 });
+      fetchCrewData(); // Refresh crew data
+    } catch (error) {
+      console.error("Failed to add new crew:", error);
+      alert("Failed to add new crew. Please try again.");
+    }
   };
 
-  const handleAddEmployee = (newEmployee: { name: string; age: number; role: string; salary: number; active: boolean }) => {
-    const newEmployeeWithId = { ...newEmployee, id: employees.length + 1 };
-    setEmployees([...employees, newEmployeeWithId]);
+  const handleEditCrewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axios.put(
+        `http://localhost:8080/crew-management/${editCrew.id}`,
+        editCrew
+      );
+      alert("Crew details updated successfully!");
+      setShowEditEmployeeModal(false);
+      fetchCrewData(); // Refresh crew data
+    } catch (error) {
+      console.error("Failed to update crew details:", error);
+      alert("Failed to update crew details. Please try again.");
+    }
+  };
+
+  const handleDeleteCrew = async (id: string) => {
+    try {
+      await axios.delete(`http://localhost:8080/crew-management/${id}`);
+      alert("Crew deleted successfully!");
+      fetchCrewData(); // Refresh crew data
+    } catch (error) {
+      console.error("Failed to delete crew:", error);
+      alert("Failed to delete crew. Please try again.");
+    }
   };
 
   return (
@@ -85,15 +137,15 @@ export const AirEmployeePage: React.FC = () => {
               onChange={handleRoleFilterChange}
             >
               <option value="">All</option>
-              <option value="Pilot">Pilot</option>
-              <option value="Flight Attendant">Flight Attendant</option>
-              <option value="Ground Crew">Ground Crew</option>
+              <option value="PILOT">Pilot</option>
+              <option value="CABIN_CREW">Cabin Crew</option>
+              <option value="GROUND_STAFF">Ground Staff</option>
             </select>
           </div>
 
           <button
             type="button"
-            className="btn btn-light-primary border-0 rounded mx-2"
+            className="btn btn-primary mx-2"
             onClick={() => setShowAddEmployeeModal(true)}
           >
             <i className="fs-2 bi bi-plus" />
@@ -109,60 +161,51 @@ export const AirEmployeePage: React.FC = () => {
             <thead>
               <tr className="fw-bold fs-6 text-gray-800 border-bottom border-gray-200">
                 <th>Name</th>
-                <th>Age</th>
                 <th>Role</th>
-                <th>Salary</th>
-                <th>Actions</th>
+                <th>Availability</th>
+                <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredEmployees
-                .slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage)
-                .map((employee) => (
+                .slice(
+                  (currentPage - 1) * entriesPerPage,
+                  currentPage * entriesPerPage
+                )
+                .map((employee: any) => (
                   <tr key={employee.id}>
                     <td>{employee.name}</td>
-                    <td>{employee.age}</td>
                     <td>{employee.role}</td>
-                    <td>{employee.salary}</td>
-
+                    <td>
+                      {employee.availability ? "Available" : "Unavailable"}
+                    </td>
                     <td className="text-center">
-                      <div className="d-flex flex-row align-items-center">
-                        <button
-                          className="btn btn-icon btn-bg-light btn-sm me-1"
-                          // View button functionality
-                        >
-                          <i className="ki-duotone ki-eye fs-3 text-primary">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                            <span className="path3"></span>
-                          </i>
-                        </button>
+                      {/* Edit Button */}
+                      <button
+                        className="btn btn-primary me-2"
+                        onClick={() => {
+                          setEditCrew(employee);
+                          setShowEditEmployeeModal(true);
+                        }}
+                      >
+                        <i
+                          className="bi bi-pencil"
+                          style={{ fontSize: "16px", marginRight: "5px" }}
+                        />
+                        Edit
+                      </button>
 
-                        <button
-                          type="button"
-                          className="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
-                          // Edit button functionality
-                        >
-                          <i className="ki-duotone ki-pencil fs-3 text-primary">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                          </i>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
-                          // Delete button functionality
-                        >
-                          <i className="ki-duotone ki-trash fs-3 text-danger">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                            <span className="path3"></span>
-                            <span className="path4"></span>
-                            <span className="path5"></span>
-                          </i>
-                        </button>
-                      </div>
+                      {/* Delete Button */}
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleDeleteCrew(employee.id)}
+                      >
+                        <i
+                          className="bi bi-trash"
+                          style={{ fontSize: "16px", marginRight: "5px" }}
+                        />
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -183,12 +226,162 @@ export const AirEmployeePage: React.FC = () => {
       </div>
 
       {/* Add Employee Modal */}
-      {/* {showAddEmployeeModal && (
-        <AddAirEmployee
-          onClose={() => setShowAddEmployeeModal(false)}
-          onAdd={handleAddEmployee}
-        />
-      )} */}
+      {showAddEmployeeModal && (
+        <div className="modal show d-block" role="dialog">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Add New Crew</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowAddEmployeeModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleAddCrewSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label">Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={newCrew.name}
+                      onChange={(e) =>
+                        setNewCrew({ ...newCrew, name: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Role</label>
+                    <select
+                      className="form-select"
+                      value={newCrew.role}
+                      onChange={(e) =>
+                        setNewCrew({ ...newCrew, role: e.target.value })
+                      }
+                      required
+                    >
+                      <option value="">Select Role</option>
+                      <option value="PILOT">Pilot</option>
+                      <option value="CABIN_CREW">Cabin Crew</option>
+                      <option value="GROUND_STAFF">Ground Staff</option>
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Availability</label>
+                    <select
+                      className="form-select"
+                      value={newCrew.availability ? "true" : "false"}
+                      onChange={(e) =>
+                        setNewCrew({
+                          ...newCrew,
+                          availability: e.target.value === "true",
+                        })
+                      }
+                      required
+                    >
+                      <option value="true">Available</option>
+                      <option value="false">Unavailable</option>
+                    </select>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowAddEmployeeModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Add Crew
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Employee Modal */}
+      {showEditEmployeeModal && (
+        <div className="modal show d-block" role="dialog">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Crew</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowEditEmployeeModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={handleEditCrewSubmit}>
+                  <div className="mb-3">
+                    <label className="form-label">Name</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={editCrew.name}
+                      onChange={(e) =>
+                        setEditCrew({ ...editCrew, name: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Role</label>
+                    <select
+                      className="form-select"
+                      value={editCrew.role}
+                      onChange={(e) =>
+                        setEditCrew({ ...editCrew, role: e.target.value })
+                      }
+                      required
+                    >
+                      <option value="">Select Role</option>
+                      <option value="PILOT">Pilot</option>
+                      <option value="CABIN_CREW">Cabin Crew</option>
+                      <option value="GROUND_STAFF">Ground Staff</option>
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">Availability</label>
+                    <select
+                      className="form-select"
+                      value={editCrew.availability ? "true" : "false"}
+                      onChange={(e) =>
+                        setEditCrew({
+                          ...editCrew,
+                          availability: e.target.value === "true",
+                        })
+                      }
+                      required
+                    >
+                      <option value="true">Available</option>
+                      <option value="false">Unavailable</option>
+                    </select>
+                  </div>
+                  <div className="modal-footer">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowEditEmployeeModal(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary">
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
