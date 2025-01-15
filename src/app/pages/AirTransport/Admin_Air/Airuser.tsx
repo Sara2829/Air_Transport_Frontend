@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Pagination from "../../Pagination";
 import AddAirUser from "./AddUser"; // AddAirUser modal
-import EditAirUser from "./EditAirUser"; // EditAirUser modal
 
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
@@ -12,8 +11,6 @@ export const AirUserPage: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(5);
   const [search, setSearch] = useState("");
   const [showAddUserModal, setShowAddUserModal] = useState(false);
-  const [showEditUserModal, setShowEditUserModal] = useState(false);
-  const [userToEdit, setUserToEdit] = useState<any | null>(null); // Updated type to any
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -49,33 +46,6 @@ export const AirUserPage: React.FC = () => {
   const handleAddUser = (newUser: { username: string; email: string }) => {
     const newUserWithId = { ...newUser, id: users.length + 1 };
     setUsers((prevUsers) => [...prevUsers, newUserWithId]);
-  };
-
-  const handleEditUser = (user: any) => {
-    console.log("Editing user:", user);
-    setUserToEdit(user);
-    setShowEditUserModal(true);
-    
-    
-    console.log(showEditUserModal);
-  };
-
-  const handleUpdateUser = (updatedUser: { id: number; username: string; email: string }) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-    );
-    setShowEditUserModal(false);
-  };
-
-  const handleDeleteUser = async (userId: number) => {
-    try {
-      await axios.delete(`${API_URL}/auth/delete/${userId}`);
-      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
-      alert("User deleted successfully!");
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      alert("Failed to delete the user, please try again.");
-    }
   };
 
   return (
@@ -116,7 +86,7 @@ export const AirUserPage: React.FC = () => {
               <tr className="fw-bold fs-6 text-gray-800 border-bottom border-gray-200">
                 <th>Username</th>
                 <th>Email</th>
-                <th>Actions</th>
+                <th>Password</th>
               </tr>
             </thead>
             <tbody>
@@ -126,30 +96,7 @@ export const AirUserPage: React.FC = () => {
                   <tr key={user.id}>
                     <td>{user.username}</td>
                     <td>{user.email}</td>
-                    <td className="text-center">
-                      <div className="d-flex flex-row align-items-center">
-                        <button
-                          className="btn btn-icon btn-bg-light btn-sm me-1"
-                          onClick={() => handleEditUser(user)}
-                        >
-                          <i className="ki-duotone ki-pencil fs-3 text-primary">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                          </i>
-                        </button>
-
-                        <button
-                          type="button"
-                          className="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1"
-                          onClick={() => handleDeleteUser(user.id)}
-                        >
-                          <i className="ki-duotone ki-trash fs-3 text-danger">
-                            <span className="path1"></span>
-                            <span className="path2"></span>
-                          </i>
-                        </button>
-                      </div>
-                    </td>
+                    <td>{user.password ? user.password : "Not Provided"}</td>
                   </tr>
                 ))}
             </tbody>
@@ -173,15 +120,6 @@ export const AirUserPage: React.FC = () => {
         <AddAirUser
           onClose={() => setShowAddUserModal(false)}
           onAdd={handleAddUser}
-        />
-      )}
-
-      {/* Edit User Modal */}
-      {showEditUserModal && (
-        <EditAirUser
-        user={userToEdit}
-          onClose={() => setShowEditUserModal(false)}
-          onUpdate={handleUpdateUser}
         />
       )}
     </div>
