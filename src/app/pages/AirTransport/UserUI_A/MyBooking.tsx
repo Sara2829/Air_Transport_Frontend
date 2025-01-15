@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_APP_API_URL;
 
 export const MyBooking = () => {
   const [bookingDetails, setBookingDetails] = useState<any[]>([]); // Array to store multiple bookings
@@ -20,7 +21,7 @@ export const MyBooking = () => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:8080/bookings/${bookingId}`);
+        const response = await axios.get(`${API_URL}/bookings/${bookingId}`);
         
         // Append the new booking to the list of bookings
         setBookingDetails((prevBookingDetails) => [

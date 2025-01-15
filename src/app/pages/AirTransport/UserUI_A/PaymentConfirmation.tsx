@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { jsPDF } from 'jspdf';
 
+const API_URL = import.meta.env.VITE_APP_API_URL;
+
 const PaymentConfirmation: React.FC = () => {
   const location = useLocation();
   const { bookingId, totalAmount, paymentStatus: initialPaymentStatus, paymentId } = location.state as {
@@ -20,7 +22,7 @@ const PaymentConfirmation: React.FC = () => {
         try {
           // Update the payment status to SUCCESS on the backend
           const response = await axios.put(
-            `http://localhost:8080/payments/${paymentId}`, // API endpoint to confirm payment
+            `${API_URL}/payments/${paymentId}`, // API endpoint to confirm payment
             {
               amount: totalAmount,
               status: 'SUCCESS',
