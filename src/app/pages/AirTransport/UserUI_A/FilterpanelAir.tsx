@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_APP_API_URL;
+
 const FilterpanelAir: React.FC<{ onFilterApply: (filteredFlights: any[]) => void }> = ({
   onFilterApply,
 }) => {
@@ -38,7 +40,7 @@ const FilterpanelAir: React.FC<{ onFilterApply: (filteredFlights: any[]) => void
       const filteredFlights: any[] = [];
       if (selectedAirlines.length > 0) {
         for (const airline of selectedAirlines) {
-          const response = await axios.get(`http://localhost:8080/flights/airline/${airline}`);
+          const response = await axios.get(`${API_URL}/flights/airline/${airline}`);
           console.log("Response:", response.data);
           filteredFlights.push(...response.data);
         }

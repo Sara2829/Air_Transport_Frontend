@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+const API_URL = import.meta.env.VITE_APP_API_URL;
 
 const UserDashBoardAir: React.FC = () => {
   const [flights, setFlights] = useState<any[]>([]);
@@ -8,18 +10,16 @@ const UserDashBoardAir: React.FC = () => {
   useEffect(() => {
     const fetchFlights = async () => {
       try {
-        const response = await fetch("http://localhost:8080/flights/all");
-        if (response.ok) {
-          const data = await response.json();
-          const flightsWithImages = data.map((flight: any) => ({
-            ...flight,
-            image:
-              "https://flybitlux.com/wp-content/uploads/2023/12/plane-that-has-word-sa-it.jpg",
-          }));
-          setFlights(flightsWithImages);
-        } else {
-          console.error("Failed to fetch flights");
-        }
+        const response = await axios.get(`${API_URL}/flights/all`);
+
+        // Map flight data with additional image
+        const flightsWithImages = response.data.map((flight: any) => ({
+          ...flight,
+          image:
+            "https://flybitlux.com/wp-content/uploads/2023/12/plane-that-has-word-sa-it.jpg",
+        }));
+
+        setFlights(flightsWithImages);
       } catch (error) {
         console.error("Error while fetching flights:", error);
       }
@@ -29,7 +29,6 @@ const UserDashBoardAir: React.FC = () => {
   }, []);
 
   const handleBookNow = (flight: any) => {
-    // Navigate to AirDetails page with flight details as state
     navigate("/AirDetails", {
       state: {
         name: flight.flightName,

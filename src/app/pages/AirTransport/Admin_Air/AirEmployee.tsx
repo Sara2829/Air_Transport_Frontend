@@ -33,7 +33,7 @@ export const AirEmployeePage: React.FC = () => {
   const fetchCrewData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8080/crew-management/all"
+        `${API_URL}/crew-management/all`
       );
       setEmployees(response.data);
     } catch (error) {
@@ -66,7 +66,7 @@ export const AirEmployeePage: React.FC = () => {
   const handleAddCrewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/crew-management", newCrew);
+      await axios.post(`${API_URL}/crew-management`, newCrew);
       alert("New crew added successfully!");
       setShowAddEmployeeModal(false);
       setNewCrew({ name: "", role: "", availability: true, adminId: 1 });
@@ -81,7 +81,7 @@ export const AirEmployeePage: React.FC = () => {
     e.preventDefault();
     try {
       await axios.put(
-        `http://localhost:8080/crew-management/${editCrew.id}`,
+        `${API_URL}/crew-management/${editCrew.id}`,
         editCrew
       );
       alert("Crew details updated successfully!");
@@ -95,7 +95,7 @@ export const AirEmployeePage: React.FC = () => {
 
   const handleDeleteCrew = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:8080/crew-management/${id}`);
+      await axios.delete(`${API_URL}/crew-management/${id}`);
       alert("Crew deleted successfully!");
       fetchCrewData(); // Refresh crew data
     } catch (error) {

@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_APP_API_URL;
+
 const AirDetailsPage: React.FC = () => {
   const location = useLocation();
   const flightDetails = location.state as {
@@ -23,7 +25,7 @@ const AirDetailsPage: React.FC = () => {
     console.log("Number of Travelers:", travellerCount);
     try {
       // Call backend API to create a booking
-      const response = await axios.post("http://localhost:8080/bookings", {
+      const response = await axios.post(`${API_URL}/bookings`, {
         flightId: flightDetails.flightId,
         travellerCount,
       });
