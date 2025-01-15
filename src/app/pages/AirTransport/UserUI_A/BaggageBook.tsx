@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_APP_API_URL;
 
 const BaggageBook: React.FC = () => {
   const location = useLocation();
@@ -34,7 +35,7 @@ const BaggageBook: React.FC = () => {
     try {
       // Send baggage details to the backend
       const response = await axios.post(
-        `http://localhost:8080/baggages/booking/${bookingId}`, // Use bookingId in path
+        `${API_URL}/baggages/booking/${bookingId}`, // Use bookingId in path
         {
           weight: parseFloat(weight), // Convert to double
           bagCount: parseInt(bagCount, 10), // Convert to int

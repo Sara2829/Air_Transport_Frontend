@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_APP_API_URL;
+
 const Payment: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ const Payment: React.FC = () => {
   const handleMakePayment = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8080/payments`, // API endpoint for processing payment
+        `${API_URL}/payments`, // API endpoint for processing payment
         {
           amount: totalAmount,
           status: paymentStatus,

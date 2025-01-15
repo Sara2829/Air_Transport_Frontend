@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_APP_API_URL;
+
 const AirCard: React.FC = () => {
   const location = useLocation();
   const { source, destination, departureDate, returnDate, numPassengers, travelClass } =
@@ -22,7 +24,7 @@ const AirCard: React.FC = () => {
     }
 
     axios
-      .get("http://localhost:8080/flights/search", {
+      .get(`${API_URL}/flights/search`, {
         params: {
           source,
           destination,
