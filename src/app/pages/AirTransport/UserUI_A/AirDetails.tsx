@@ -28,7 +28,7 @@ const AirDetailsPage: React.FC = () => {
       return;
     }
 
-    console.log("Flight ID:", flightDetails);
+    console.log("Flight ID:", flightDetails.flightId);
     console.log("Number of Travelers:", travellerCount);
     console.log("User ID:", userId);
 

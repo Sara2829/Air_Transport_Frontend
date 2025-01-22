@@ -71,8 +71,10 @@ const AirCard: React.FC = () => {
   };
 
   const handleBookNow = (plane: any) => {
+    console.log("Selected Plane:", plane);
     const { source, destination, departure, arrival, price, flightName, image, description, flightClass, flightId } = plane;
 
+    console.log("Selected Flight ID:", flightId);
     const bookingDetails = {
       source,
       destination,
@@ -85,6 +87,7 @@ const AirCard: React.FC = () => {
       flightClass,
       flightId,
     };
+    
     navigate("/AirDetails", { state: bookingDetails });
   };
 
@@ -109,6 +112,7 @@ const AirCard: React.FC = () => {
             overflowY: "auto", // Allow scrolling inside the filter if needed
           }}
         >
+          
           <h4 style={{ marginBottom: "1rem", fontWeight: "bold", color: "#333" }}>Filters</h4>
           <div style={{ marginBottom: "1.5rem" }}>
             <h5 style={{ marginBottom: "0.5rem", color: "#555" }}>Airlines</h5>

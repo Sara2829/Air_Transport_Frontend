@@ -29,6 +29,7 @@ const UserDashBoardAir: React.FC = () => {
   }, []);
 
   const handleBookNow = (flight: any) => {
+    console.log("Flight selected:", flight);
     navigate("/AirDetails", {
       state: {
         name: flight.flightName,
@@ -37,7 +38,7 @@ const UserDashBoardAir: React.FC = () => {
         price: flight.price,
         source: flight.source,
         destination: flight.destination,
-        flightId: flight.id,
+        flightId: flight.flightId,
         gallery: [
           flight.image,
           "https://example.com/gallery1.jpg",
