@@ -1,69 +1,88 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
 export const MyBooking = () => {
-  const [bookingDetails, setBookingDetails] = useState<any[]>([]); // Array to store multiple bookings
-  const [flightDetails, setFlightDetails] = useState<any>(null);
+  const [bookingDetails, setBookingDetails] = useState<any[]>([]); // Booking details array
+  const [passengerDetails, setPassengerDetails] = useState<any[]>([]); // Passenger details array
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBookingDetails = async () => {
-      const bookingId = localStorage.getItem("bookingId");
-      const storedFlightDetails = localStorage.getItem("flightDetails");
+    const fetchDetails = async () => {
+      const userId = localStorage.getItem("userId");
 
-      if (!bookingId) {
-        alert("No booking ID found in local storage.");
+      if (!userId) {
+        alert("No user ID found in local storage.");
+        setLoading(false);
         return;
       }
 
-      if (storedFlightDetails) {
-        setFlightDetails(JSON.parse(storedFlightDetails));
-      }
-
       try {
-        const response = await axios.get(`${API_URL}/bookings/${bookingId}`);
-        
-        // Append the new booking to the list of bookings
-        setBookingDetails((prevBookingDetails) => [
-          ...prevBookingDetails,
-          response.data,
-        ]);
+        // Fetch bookings based on userId
+        const bookingsResponse = await axios.get(`${API_URL}/bookings/user/${userId}`);
+        setBookingDetails(bookingsResponse.data);
+
+        // Fetch passengers related to the userId
+        const passengersResponse = await axios.get(`${API_URL}/passengers/user/${userId}`);
+        setPassengerDetails(passengersResponse.data);
+
+        setLoading(false);
       } catch (error) {
-        console.error("Failed to fetch booking details:", error);
-        alert("Failed to fetch booking details. Please try again.");
+        console.error("Error fetching details:", error);
+        alert("Failed to fetch booking or passenger details. Please try again.");
+        setLoading(false);
       }
     };
 
-    fetchBookingDetails();
+    fetchDetails();
   }, []);
 
-  if (!flightDetails) {
-    return <div>Loading flight details...</div>;
+  if (loading) {
+    return <div>Loading booking and passenger details...</div>;
   }
 
   if (bookingDetails.length === 0) {
-    return <div>Loading booking details...</div>;
+    return <div>No bookings found for the user.</div>;
   }
 
   return (
     <div className="container mt-4">
       <h3 className="mb-4">My Booking Details</h3>
 
-      {/* Loop over all bookings and display their details */}
-      {bookingDetails.map((booking) => (
-        <div key={booking.id} className="card shadow-sm mb-3">
-          <div className="card-header">
-            <h5 className="card-title">Booking ID: {booking.id}</h5>
+      {bookingDetails.map((booking) => {
+        // Filter passengers related to the current booking
+        const relatedPassengers = passengerDetails.filter(
+          (passenger) => passenger.bookingId === booking.id
+        );
+
+        return (
+          <div key={booking.id} className="card shadow-sm mb-4">
+            <div className="card-header bg-primary text-white">
+              <h5 className="card-title mb-0">Booking ID: {booking.id}</h5>
+            </div>
+            <div className="card-body">
+              <p><strong>Flight ID:</strong> {booking.flightId}</p>
+              <p><strong>Traveler Count:</strong> {booking.travellerCount}</p>
+
+              <h6 className="mt-3">Passenger Details:</h6>
+              {relatedPassengers.length > 0 ? (
+                <ul className="list-group">
+                  {relatedPassengers.map((passenger) => (
+                    <li key={passenger.id} className="list-group-item">
+                      <p><strong>Name:</strong> {passenger.name}</p>
+                      <p><strong>Email:</strong> {passenger.email}</p>
+                      <p><strong>Phone:</strong> {passenger.phone}</p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No passengers found for this booking.</p>
+              )}
+            </div>
           </div>
-          <div className="card-body">
-            <p><strong>Flight Name:</strong> {flightDetails.name}</p>
-            <p><strong>Travelers:</strong> {booking.travellerCount}</p>
-            <p><strong>Source:</strong> {flightDetails.source}</p>
-            <p><strong>Destination:</strong> {flightDetails.destination}</p>
-            <p><strong>Price:</strong> ₹{flightDetails.price}</p>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };

@@ -36,6 +36,7 @@
     "react-bootstrap": "2.5.0-beta.1",
     "react-copy-to-clipboard": "5.1.0",
     "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6",
     "react-flatpickr": "^3.10.13",
     "react-icons": "^5.4.0",
     "react-inlinesvg": "4.1.0",

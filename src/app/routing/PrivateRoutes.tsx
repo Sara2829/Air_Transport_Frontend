@@ -54,6 +54,7 @@ import PassengerEntryPage from "../pages/AirTransport/UserUI_A/PassengerEntryPag
 import BaggageBook from "../pages/AirTransport/UserUI_A/BaggageBook";
 import Payment from "../pages/AirTransport/UserUI_A/Payment";
 import PaymentConfirmation from "../pages/AirTransport/UserUI_A/PaymentConfirmation";
+import { PlaneSeating } from "../pages/AirTransport/UserUI_A/PlaneSeating";
 
 
 const PrivateRoutes = () => {
@@ -144,6 +145,7 @@ const PrivateRoutes = () => {
 
         <Route path="/Air/Search" element={<SearchAir />} />
         <Route path="/AirDetails/passengerEntry" element={<PassengerEntryPage />} />
+        <Route path="/AirDetails/Seat-selection" element={<PlaneSeating />} />
         <Route path="/AirDetails/baggage" element={<BaggageBook />} />
         <Route path="/payment/confirmation" element={<Payment />} />
         <Route path="/payment/status" element={<PaymentConfirmation />} />

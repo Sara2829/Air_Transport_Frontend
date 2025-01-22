@@ -21,13 +21,23 @@ const AirDetailsPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleNavigateToPassengerEntry = async () => {
-    console.log("Flight ID:", flightDetails.flightId);
+    const userId = localStorage.getItem("userId"); // Get userId from local storage
+
+    if (!userId) {
+      alert("User not logged in.");
+      return;
+    }
+
+    console.log("Flight ID:", flightDetails);
     console.log("Number of Travelers:", travellerCount);
+    console.log("User ID:", userId);
+
     try {
-      // Call backend API to create a booking
+      // Call backend API to create a booking with userId and travellerCount
       const response = await axios.post(`${API_URL}/bookings`, {
         flightId: flightDetails.flightId,
-        travellerCount,
+        userId: userId, // Pass the userId
+        travellerCount: travellerCount, // Pass the traveller count
       });
 
       // Log the full backend response for debugging
@@ -46,7 +56,7 @@ const AirDetailsPage: React.FC = () => {
       localStorage.setItem("flightDetails", JSON.stringify(flightDetails));
 
       // Navigate to Passenger Entry page with flight details, travelers, and booking ID
-      navigate("/AirDetails/passengerEntry", {
+      navigate("/AirDetails/Seat-selection", {
         state: { flightDetails, travellerCount, bookingId },
       });
     } catch (error: any) {
@@ -107,7 +117,7 @@ const AirDetailsPage: React.FC = () => {
                 className="btn btn-primary float-end"
                 onClick={handleNavigateToPassengerEntry}
               >
-                Proceed to Passenger Entry
+                Proceed to Seat Selection
               </button>
             </div>
           </div>
