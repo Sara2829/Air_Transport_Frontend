@@ -55,6 +55,7 @@ import BaggageBook from "../pages/AirTransport/UserUI_A/BaggageBook";
 import Payment from "../pages/AirTransport/UserUI_A/Payment";
 import PaymentConfirmation from "../pages/AirTransport/UserUI_A/PaymentConfirmation";
 import { PlaneSeating } from "../pages/AirTransport/UserUI_A/PlaneSeating";
+import SuccessfulPayment from "../pages/AirTransport/UserUI_A/SuccessfulPayment";
 
 
 const PrivateRoutes = () => {
@@ -148,7 +149,7 @@ const PrivateRoutes = () => {
         <Route path="/AirDetails/Seat-selection" element={<PlaneSeating />} />
         <Route path="/AirDetails/baggage" element={<BaggageBook />} />
         <Route path="/payment/confirmation" element={<Payment />} />
-        <Route path="/payment/status" element={<PaymentConfirmation />} />
+        <Route path="/payment/status" element={<SuccessfulPayment />} />
 
         <Route path="/Air/MyBookings" element={<MyBooking />} />
         <Route path="Air/Baggage" element={<Baggage/>} />

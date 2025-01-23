@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_APP_API_URL;
 
 const PassengerEntryPage: React.FC = () => {
   const location = useLocation();
-  const { flightDetails, bookingId, travellerCount, selectedSeats } = location.state as {
+  const { flightDetails, bookingId, travellerCount, selectedSeats, selectedSeatIds } = location.state as {
     flightDetails: {
       name: string;
       image: string;
@@ -18,66 +18,97 @@ const PassengerEntryPage: React.FC = () => {
     };
     bookingId: string;
     travellerCount: number; // Expected number of passengers
-    selectedSeats: string[]; // Seats passed from the Plane Seating page
+    selectedSeats: string[]; // Seat names passed from Plane Seating page
+    selectedSeatIds: number[]; // Seat IDs passed from Plane Seating page
   };
 
   console.log("Flight Details:", flightDetails);
   console.log("Booking ID:", bookingId);
-  console.log("Traveller Count:", travellerCount);  
+  console.log("Traveller Count:", travellerCount);
   console.log("Selected Seats:", selectedSeats);
+  console.log("Selected Seat IDs:", selectedSeatIds);
 
   const [passengerInfo, setPassengerInfo] = useState({
     name: "",
     email: "",
     phone: "",
-    seat: "", // Selected seat for the passenger
+    seatId: 0, // Seat ID for the passenger
   });
   const [passengers, setPassengers] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [assignedSeats, setAssignedSeats] = useState<string[]>([]);
+  const [assignedSeatIds, setAssignedSeatIds] = useState<number[]>([]);
   const navigate = useNavigate();
 
   const handleAddPassenger = () => {
     // Validate passenger details
-    if (!passengerInfo.name || !passengerInfo.email || !passengerInfo.phone || !passengerInfo.seat) {
+    if (!passengerInfo.name || !passengerInfo.email || !passengerInfo.phone || !passengerInfo.seatId) {
       setErrorMessage("Please fill in all fields for the passenger, including seat selection.");
       return;
     }
 
     // Check if the seat is already assigned
-    if (assignedSeats.includes(passengerInfo.seat)) {
+    if (assignedSeatIds.includes(passengerInfo.seatId)) {
       setErrorMessage("The selected seat is already assigned to another passenger.");
       return;
     }
 
     // Add passenger to the local array
     setPassengers([...passengers, { ...passengerInfo }]);
-    setAssignedSeats([...assignedSeats, passengerInfo.seat]);
-    setPassengerInfo({ name: "", email: "", phone: "", seat: "" });
+    setAssignedSeatIds([...assignedSeatIds, passengerInfo.seatId]);
+    setPassengerInfo({ name: "", email: "", phone: "", seatId: 0 });
     setErrorMessage(""); // Clear any previous error messages
   };
 
   const handleSubmitPassengers = async () => {
     const userId = localStorage.getItem("userId"); // Get userId from localStorage
-
+  
     if (!userId) {
       alert("User not logged in.");
       return;
     }
-
+  
     try {
-      // Send passengers array to the backend with userId as a path variable
+      // Map passengers to match the required format with seatId
+      const payload = passengers.map((passenger) => ({
+        name: passenger.name,
+        email: passenger.email,
+        phone: passenger.phone,
+        bookingId: parseInt(bookingId), // Ensure bookingId is a number
+        userId: parseInt(userId), // Ensure userId is a number
+        seatId: passenger.seatId,
+      }));
+  
+      console.log("Payload:", payload);
+  
+      // Send passengers array to the backend
       const response = await axios.post(
         `${API_URL}/passengers/add/${bookingId}/${userId}`,
-        passengers,
+        payload,
         {
           headers: { "Content-Type": "application/json" },
         }
       );
-
+  
       console.log("Passengers successfully added:", response.data);
-      alert("Passengers successfully registered!");
-
+  
+      // Update the seat availability to false
+      for (const passenger of passengers) {
+        const seatId = passenger.seatId;
+        try {
+          await axios.put(
+            `${API_URL}/seats/${seatId}/availability?isAvailable=false`
+          );
+          console.log(`Seat ${seatId} availability updated to false.`);
+        } catch (error) {
+          console.error(`Failed to update availability for seat ${seatId}:`, error);
+          alert(
+            `Failed to update seat availability for Seat ID ${seatId}. Please check your connection or try again.`
+          );
+        }
+      }
+  
+      alert("Passengers successfully registered and seat availability updated!");
+  
       // Navigate to the baggage page with relevant details
       navigate("/AirDetails/baggage", {
         state: {
@@ -92,10 +123,12 @@ const PassengerEntryPage: React.FC = () => {
       alert("Failed to submit passengers. Please try again.");
     }
   };
+  
+  
 
   const handleDeletePassenger = (index: number) => {
     const passengerToRemove = passengers[index];
-    setAssignedSeats(assignedSeats.filter((seat) => seat !== passengerToRemove.seat));
+    setAssignedSeatIds(assignedSeatIds.filter((seatId) => seatId !== passengerToRemove.seatId));
     setPassengers(passengers.filter((_, i) => i !== index));
   };
 
@@ -154,14 +187,14 @@ const PassengerEntryPage: React.FC = () => {
             <label className="form-label">Seat</label>
             <select
               className="form-select"
-              value={passengerInfo.seat}
-              onChange={(e) => setPassengerInfo({ ...passengerInfo, seat: e.target.value })}
+              value={passengerInfo.seatId}
+              onChange={(e) => setPassengerInfo({ ...passengerInfo, seatId: parseInt(e.target.value) })}
             >
-              <option value="">Select a seat</option>
-              {selectedSeats.map((seat) =>
-                assignedSeats.includes(seat) ? null : (
-                  <option key={seat} value={seat}>
-                    {seat}
+              <option value={0}>Select a seat</option>
+              {selectedSeatIds.map((seatId, index) =>
+                assignedSeatIds.includes(seatId) ? null : (
+                  <option key={seatId} value={seatId}>
+                    {selectedSeats[index]}
                   </option>
                 )
               )}
@@ -194,8 +227,8 @@ const PassengerEntryPage: React.FC = () => {
               <ul className="list-group">
                 {passengers.map((passenger, index) => (
                   <li key={index} className="list-group-item">
-                    {index + 1}. {passenger.name} - {passenger.email} - {passenger.phone} - Seat:{" "}
-                    {passenger.seat}
+                    {index + 1}. {passenger.name} - {passenger.email} - {passenger.phone} - Seat ID:{" "}
+                    {passenger.seatId}
                     <button
                       className="btn btn-warning btn-sm ms-2"
                       onClick={() => handleEditPassenger(index)}

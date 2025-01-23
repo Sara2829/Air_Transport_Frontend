@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AirHomePage: React.FC = () => {
   const [source, setSource] = useState("");
@@ -34,11 +35,21 @@ const AirHomePage: React.FC = () => {
     });
   };
 
+  const handleViewOnGoogleMaps = () => {
+      if (!source || !destination) {
+        alert("Please select both source and destination first.");
+        return;
+      }
+      const mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${source}&destination=${destination}`;
+      window.open(mapUrl, "_blank");
+    };
+
+
   return (
     <div className="container mt-4">
       <div className="card">
         <div className="card-header">
-          <h1> This is Air user HomePage</h1>
+          <h1>This is Air user HomePage</h1>
           <h3 className="card-title">Air Travel Booking Form</h3>
         </div>
         <div className="card-body">
@@ -133,9 +144,15 @@ const AirHomePage: React.FC = () => {
             </div>
 
             {/* Search Button */}
-            <div className="col-md-12 mt-12 d-flex justify-content-end">
+            <div className="col-md-12 mt-2 d-flex justify-content-end">
               <button className="btn btn-primary" onClick={handleSearch}>
                 Search
+              </button>
+              <button
+                className="btn btn-secondary ms-2"
+                onClick={handleViewOnGoogleMaps}
+              >
+                View on Google Maps
               </button>
             </div>
           </div>

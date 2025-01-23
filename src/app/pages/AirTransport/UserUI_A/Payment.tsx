@@ -13,48 +13,28 @@ const Payment: React.FC = () => {
     price: number;
   };
 
-  const [paymentStatus, setPaymentStatus] = useState('PENDING');
   const [totalAmount, setTotalAmount] = useState(0);
-  const [paymentId, setPaymentId] = useState<string | null>(null); // Track paymentId
 
   useEffect(() => {
-    // Calculate total amount based on passenger count and price
     const calculatedAmount = passengerCount * price;
     setTotalAmount(calculatedAmount);
   }, [passengerCount, price]);
 
-  const handleMakePayment = async () => {
+  const handleProceedToPayment = async () => {
     try {
-      const response = await axios.post(
-        `${API_URL}/payments`, // API endpoint for processing payment
-        {
-          amount: totalAmount,
-          status: paymentStatus,
-          bookingId: bookingId,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+      const response = await axios.get(
+        `${API_URL}/payments/proceed/${bookingId}`,
+        { headers: { "Content-Type": "application/json" } }
       );
 
-      alert("Payment successful! Your booking is confirmed.");
-      console.log("this is valid id",response.data.id); // Assume we get paymentId from the response
-      // Assume we get paymentId from the response
-      const receivedPaymentId = response.data.id;
-       // Log the received paymentId
-      setPaymentId(receivedPaymentId); // Store the paymentId
-
-      // Navigate to the next page with the payment details
-      navigate('/payment/status', {
-        state: {
-          bookingId,
-          totalAmount,
-          paymentStatus: 'PENDING', // Pass status as PENDING
-          paymentId: receivedPaymentId, // Pass paymentId to the next page
-        },
-      });
+      const { sessionUrl } = response.data;
+      if (sessionUrl) {
+        window.location.href = sessionUrl;
+      } else {
+        alert("Payment session could not be created. Please try again.");
+      }
     } catch (error) {
-      console.error("Error processing payment:", error);
+      console.error("Error creating payment session:", error);
       alert("Payment failed. Please try again.");
     }
   };
@@ -67,12 +47,9 @@ const Payment: React.FC = () => {
           <p>Booking ID: <strong>{bookingId}</strong></p>
         </div>
         <div className="card-body">
-          <p><strong>Payment Status:</strong> {paymentStatus}</p>
           <p><strong>Total Amount:</strong> ₹{totalAmount}</p>
-          
-          {/* Make Payment Button */}
-          <button className="btn btn-success" onClick={handleMakePayment}>
-            Make Payment
+          <button className="btn btn-success" onClick={handleProceedToPayment}>
+            Proceed to Payment
           </button>
         </div>
       </div>
