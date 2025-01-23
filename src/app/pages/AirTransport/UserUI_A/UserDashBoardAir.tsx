@@ -31,7 +31,6 @@ const UserDashBoardAir: React.FC = () => {
   }, []);
 
   const handleBookNow = (flight: any) => {
-    console.log("Flight selected:", flight);
     navigate("/AirDetails", {
       state: {
         name: flight.flightName,
@@ -45,7 +44,7 @@ const UserDashBoardAir: React.FC = () => {
           flight.image,
           "https://example.com/gallery1.jpg",
           "https://example.com/gallery2.jpg",
-        ], // Example gallery images
+        ],
       },
     });
   };
@@ -56,6 +55,7 @@ const UserDashBoardAir: React.FC = () => {
 
   return (
     <div style={{ padding: "2rem", backgroundColor: "#f7f9fc" }}>
+      {/* Main Heading */}
       <h1 style={{ textAlign: "center", marginBottom: "2rem", color: "#333" }}>
         Air User Dashboard
       </h1>
@@ -63,97 +63,141 @@ const UserDashBoardAir: React.FC = () => {
       <div style={{ display: "flex", gap: "2rem" }}>
         {/* Left Column: Flight Cards */}
         <div style={{ flex: 1 }}>
-          <h2 style={{ color: "#007bff", marginBottom: "1rem" }}>
-            Flights Info
-          </h2>
+          {/* Flights Info Heading - Steady */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "1.5rem",
+              position: "sticky",
+              top: "2rem",
+              backgroundColor: "#f7f9fc",
+              zIndex: 10,
+              paddingBottom: "1rem",
             }}
           >
-            {flights.map((flight, index) => (
-              <div
-                key={index}
-                onClick={() => handleCardClick(flight)}
-                style={{
-                  backgroundColor: "#fff",
-                  borderRadius: "8px",
-                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                  overflow: "hidden",
-                  cursor: "pointer",
-                }}
-              >
-                <img
-                  src={flight.image}
-                  alt={flight.flightName}
+            <h2 style={{ color: "#007bff", marginBottom: "0rem" }}>
+              Flights Info
+            </h2>
+          </div>
+
+          {/* Scrollable Flight Cards */}
+          <div
+            style={{
+              overflowY: "auto",
+              maxHeight: "calc(100vh - 6rem)",
+              paddingRight: "1rem",
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gap: "1.5rem",
+              }}
+            >
+              {flights.map((flight, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleCardClick(flight)}
                   style={{
-                    width: "100%",
-                    height: "200px",
-                    objectFit: "cover",
+                    backgroundColor: "#fff",
+                    borderRadius: "8px",
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                    overflow: "hidden",
+                    cursor: "pointer",
                   }}
-                />
-                <div style={{ padding: "1rem" }}>
-                  <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-                    {flight.flightName}
-                  </h3>
-                  <p style={{ margin: "0.5rem 0", color: "#666" }}>
-                    From: {flight.source} to {flight.destination}
-                  </p>
-                  <p style={{ margin: "0.5rem 0", color: "#666" }}>
-                    Airline: {flight.airline}
-                  </p>
-                  <p style={{ margin: "0.5rem 0", color: "#666" }}>
-                    Departure: {new Date(flight.departure).toLocaleString()}
-                  </p>
-                  <p style={{ margin: "0.5rem 0", color: "#666" }}>
-                    Arrival: {new Date(flight.arrival).toLocaleString()}
-                  </p>
-                  <p style={{ fontWeight: "bold", color: "#007bff" }}>
-                    Price: ₹{flight.price}
-                  </p>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the card click
-                      handleBookNow(flight);
-                    }}
+                >
+                  <img
+                    src={flight.image}
+                    alt={flight.flightName}
                     style={{
-                      marginTop: "1rem",
-                      padding: "0.5rem 1rem",
-                      backgroundColor: "#007bff",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
+                      width: "100%",
+                      height: "200px",
+                      objectFit: "cover",
                     }}
-                  >
-                    Book Now
-                  </button>
+                  />
+                  <div style={{ padding: "1rem" }}>
+                    <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+                      {flight.flightName}
+                    </h3>
+                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                      From: {flight.source} to {flight.destination}
+                    </p>
+                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                      Airline: {flight.airline}
+                    </p>
+                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                      Departure: {new Date(flight.departure).toLocaleString()}
+                    </p>
+                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                      Arrival: {new Date(flight.arrival).toLocaleString()}
+                    </p>
+                    <p style={{ fontWeight: "bold", color: "#007bff" }}>
+                      Price: ₹{flight.price}
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleBookNow(flight);
+                      }}
+                      style={{
+                        marginTop: "1rem",
+                        padding: "0.5rem 1rem",
+                        backgroundColor: "#007bff",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Book Now
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Right Column: Map */}
-        <div style={{ flex: 1 }}>
-          <div style={{ position: "relative", height: "500px" }}>
-            {/* Message at the top, only visible when no flight is selected */}
+        {/* Right Column: Google Map */}
+        <div
+          style={{
+            flex: 1,
+            position: "sticky",
+            top: "2rem",
+          }}
+        >
+          <h2 style={{ color: "#007bff", marginBottom: "1rem" }}>Google Map</h2>
+          <div
+            style={{
+              position: "relative",
+              height: "580px",
+              backgroundColor: "#d0e8f2", // Light blue resembling Google Maps
+              borderRadius: "8px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              overflow: "hidden",
+            }}
+          >
+            {/* Message at the center */}
             {!selectedFlight && (
               <div
                 style={{
                   position: "absolute",
-                  top: "10px",
+                  top: "50%",
                   left: "50%",
-                  transform: "translateX(-50%)",
-                  background: "rgba(255, 255, 255, 0.7)",
-                  padding: "10px 20px",
-                  borderRadius: "5px",
-                  boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                  transform: "translate(-50%, -50%)",
+                  textAlign: "center",
+                  zIndex: 10,
                 }}
               >
-                Click on a flight card to view the source, destination, and path on Google Map.
+                <p
+                  style={{
+                    fontSize: "1.2rem",
+                    fontWeight: "600",
+                    color: "#333",
+                  }}
+                >
+                  Click on a flight card to view the source, destination, and path
+                  on Google Map.
+                </p>
               </div>
             )}
 
@@ -164,7 +208,10 @@ const UserDashBoardAir: React.FC = () => {
                 width="100%"
                 height="100%"
                 frameBorder="0"
-                style={{ border: 0 }}
+                style={{
+                  border: 0,
+                  borderRadius: "8px",
+                }}
                 src={`https://www.google.com/maps?q=${encodeURIComponent(
                   selectedFlight.source
                 )}+to+${encodeURIComponent(selectedFlight.destination)}&output=embed`}

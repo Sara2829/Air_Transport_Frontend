@@ -149,7 +149,7 @@ const AirHomePage: React.FC = () => {
                 Search
               </button>
               <button
-                className="btn btn-secondary ms-2"
+                className="btn btn-primary ms-2"
                 onClick={handleViewOnGoogleMaps}
               >
                 View on Google Maps

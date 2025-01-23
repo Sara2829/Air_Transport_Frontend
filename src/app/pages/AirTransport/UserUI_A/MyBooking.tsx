@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_APP_API_URL;
 
@@ -7,6 +8,7 @@ export const MyBooking = () => {
   const [bookingDetails, setBookingDetails] = useState<any[]>([]); // Booking details array
   const [passengerDetails, setPassengerDetails] = useState<any[]>([]); // Passenger details array
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -21,10 +23,12 @@ export const MyBooking = () => {
       try {
         // Fetch bookings based on userId
         const bookingsResponse = await axios.get(`${API_URL}/bookings/user/${userId}`);
+        console.log("Bookings Response:", bookingsResponse.data);
         setBookingDetails(bookingsResponse.data);
 
         // Fetch passengers related to the userId
         const passengersResponse = await axios.get(`${API_URL}/passengers/user/${userId}`);
+        console.log("Passengers Response:", passengersResponse.data);
         setPassengerDetails(passengersResponse.data);
 
         setLoading(false);
@@ -37,6 +41,28 @@ export const MyBooking = () => {
 
     fetchDetails();
   }, []);
+
+  const handleCompleteBooking = async (booking: any) => {
+    try {
+      // Fetch flight details using flightId
+      const flightResponse = await axios.get(`${API_URL}/flights/${booking.flightId}`);
+      const flightDetails = flightResponse.data;
+
+      console.log("Flight Details:", flightDetails);
+
+      // Redirect to PlaneSeating page with required data
+      navigate("/AirDetails/Seat-selection", {
+        state: {
+          flightDetails,
+          travellerCount: booking.travellerCount,
+          bookingId: booking.id,
+        },
+      });
+    } catch (error) {
+      console.error("Error fetching flight details:", error);
+      alert("Failed to fetch flight details. Please try again.");
+    }
+  };
 
   if (loading) {
     return <div>Loading booking and passenger details...</div>;
@@ -77,7 +103,15 @@ export const MyBooking = () => {
                   ))}
                 </ul>
               ) : (
-                <p>No passengers found for this booking.</p>
+                <>
+                  <p>No passengers found for this booking.</p>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => handleCompleteBooking(booking)}
+                  >
+                    Complete Booking
+                  </button>
+                </>
               )}
             </div>
           </div>
