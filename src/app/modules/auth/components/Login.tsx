@@ -1,4 +1,153 @@
+// import React, { useState } from "react";
+// import { Link, useNavigate } from "react-router-dom";
+// import { useAuth } from "../../auth/core/Auth";
 
+// interface LoginBasicInfo {
+//   email: string;
+//   password: string;
+// }
+
+// const Login: React.FC = () => {
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const [type, setType] = useState("water");
+//   const [error, setError] = useState<string | null>(null);
+//   const { saveAuth } = useAuth();
+//   const navigate = useNavigate();
+
+//   const handleLogin = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     setError(null);
+
+//     if (!type || !email || !password) {
+//       setError("Please fill in all fields.");
+//       return;
+//     }
+
+//     const loginData: LoginBasicInfo = { email, password };
+
+//     try {
+//       // Mock API response
+//       const userData = {
+//         api_token: "dummy-token",
+//         isAuthenticated: true,
+//       };
+
+//       // Save user state
+//       saveAuth(userData);
+
+//       // Navigate based on the service type
+//       switch (type) {
+//         case "water":
+//           navigate("/home");
+//           break;
+//         case "air":
+//           navigate("/Air/Homepage");
+//           break;
+//         case "ground":
+//           navigate("/Ground/homepage");
+//           break;
+//         default:
+//           navigate("/");
+//       }
+//     } catch (err) {
+//       console.error("Login failed:", err);
+//       setError("Invalid credentials or login error.");
+//     }
+//   };
+
+//   return (
+//     <div>
+//       <form
+//         className="form w-100"
+//         id="kt_login_signin_form"
+//         onSubmit={handleLogin}
+//       >
+//         <div className="text-center mb-11">
+//           <h1 className="text-gray-900 fw-bolder mb-3">Sign In</h1>
+
+//           <div className="text-gray-500 fw-semibold fs-6">
+//             Your Social Campaigns
+//           </div>
+//         </div>
+
+//         <label className="form-label fs-6 fw-bolder text-gray-900">
+//           Email:
+//           <input
+//             type="email"
+//             value={email}
+//             onChange={(e) => setEmail(e.target.value)}
+//             required
+//           />
+//         </label>
+//         <label className="form-label fs-6 fw-bolder text-gray-900">
+//           Password:
+//           <input
+//             type="password"
+//             value={password}
+//             onChange={(e) => setPassword(e.target.value)}
+//             required
+//           />
+//         </label>
+//         {/* <label>
+//           Service Type:
+//           <select value={type} onChange={(e) => setType(e.target.value)}>
+//             <option value="water">Water</option>
+//             <option value="air">Air</option>
+//             <option value="ground">Ground</option>
+//           </select>
+//         </label> */}
+
+//         <div>
+//           <label>
+//             <span>Service Type:</span>
+//             <div>
+//               <label>
+//                 <input
+//                   type="radio"
+//                   value="water"
+//                   checked={type === "water"}
+//                   onChange={(e) => setType(e.target.value)}
+//                 />
+//                 Water
+//               </label>
+//               <label>
+//                 <input
+//                   type="radio"
+//                   value="air"
+//                   checked={type === "air"}
+//                   onChange={(e) => setType(e.target.value)}
+//                 />
+//                 Air
+//               </label>
+//               <label>
+//                 <input
+//                   type="radio"
+//                   value="ground"
+//                   checked={type === "ground"}
+//                   onChange={(e) => setType(e.target.value)}
+//                 />
+//                 Ground
+//               </label>
+//             </div>
+//           </label>
+//         </div>
+
+//         {error && <p style={{ color: "red" }}>{error}</p>}
+//         <button type="submit">Login</button>
+
+//         <div className="text-gray-500 text-center fw-semibold fs-6">
+//           Not a Member yet?{" "}
+//           <Link to="/auth/registration" className="link-primary">
+//             Sign up
+//           </Link>
+//         </div>
+//       </form>
+//     </div>
+//   );
+// };
+
+// export default Login;
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +165,8 @@ const Login: React.FC = () => {
   const { saveAuth } = useAuth();
   const [selectedOption, setSelectedOption] = useState("");
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
 
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -28,7 +179,6 @@ const Login: React.FC = () => {
     }
 
     const loginData: LoginBasicInfo = { email, password, id: 0 };
-    console.log(loginData);
 
     try {
       let userData: LoginBasicInfo;
@@ -43,22 +193,18 @@ const Login: React.FC = () => {
       // Store the type in localStorage
 
       localStorage.setItem("type", type);
-      
+      console.log(localStorage);
 
       // Service and navigation based on type
       switch (type) {
         case "air":
           userData = await AirService.login(loginData);
-          console.log(userData);
-           localStorage.setItem("userId", String(userData.id)); // Save userId
-            console.log("User ID:", userData.id);
           if (userData) {
             const role = email === adminEmails.air ? "admin" : "user";
             localStorage.setItem("type", type);
             console.log(type);
             localStorage.setItem("role", role);
             console.log(role);
-           
             navigate(
               role === "admin" ? "/Air/AdminDashboard" : "/AirUserDashBoard"
             );
@@ -119,6 +265,7 @@ const Login: React.FC = () => {
             height: "100vh",
             backgroundColor: "#f7f9fc",
             padding: "20px",
+            position:"relative",
         }}
     >
         <form
@@ -175,7 +322,7 @@ const Login: React.FC = () => {
                 />
             </div>
 
-            <div className="form-group">
+            <div className="form-group" style={{position:"relative"}}>
                 <label
                     htmlFor="password"
                     style={{
@@ -187,8 +334,9 @@ const Login: React.FC = () => {
                 >
                     Password
                 </label>
+
                 <input
-                    type="password"
+                    type={showPassword ? "text":"password"}
                     id="password"
                     placeholder="Enter your password"
                     value={password}
@@ -199,12 +347,30 @@ const Login: React.FC = () => {
                     className="form-control"
                     style={{
                         marginBottom: "15px",
-                        padding: "10px",
+                        padding: "10px 40px 10px 10px",
                         border: "1px solid #ced4da",
                         borderRadius: "8px",
                         width: "100%",
                     }}
+
                 />
+                <span
+                      onClick={() => setShowPassword(!showPassword)} // Toggle visibility state
+                      style={{
+                        position: "absolute",
+                        right: "20px",
+                        top: "70%",
+                        transform: "translateY(-50%)",
+                        cursor: "pointer",
+                        fontSize:"10px",
+                        textAlign:"center",
+                        color:"#007bff",
+
+                      }}
+                    >
+                      {showPassword ? "Hide" : "Show"} {/* Inline conditional rendering */}
+                    </span>
+
             </div>
 
             <div className="form-group">

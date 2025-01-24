@@ -54,26 +54,46 @@ const UserDashBoardAir: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: "2rem", backgroundColor: "#f7f9fc" }}>
+    <div style={{ padding: "1rem", backgroundColor: "#f7f9fc" }}>
       {/* Main Heading */}
-      <h1 style={{ textAlign: "center", marginBottom: "2rem", color: "#333" }}>
+      <h1
+        style={{
+          textAlign: "center",
+          marginBottom: "1.5rem",
+          color: "#333",
+          fontSize: "2rem",
+        }}
+      >
         Air User Dashboard
       </h1>
 
-      <div style={{ display: "flex", gap: "2rem" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "1.5rem",
+          flexDirection: window.innerWidth <= 768 ? "column" : "row",
+        }}
+      >
         {/* Left Column: Flight Cards */}
-        <div style={{ flex: 1 }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: "1rem",
+          }}
+        >
           {/* Flights Info Heading - Steady */}
           <div
             style={{
               position: "sticky",
-              top: "2rem",
+              top: "1rem",
               backgroundColor: "#f7f9fc",
               zIndex: 10,
               paddingBottom: "1rem",
             }}
           >
-            <h2 style={{ color: "#007bff", marginBottom: "0rem" }}>
+            <h2 style={{ color: "#007bff", marginBottom: "0rem", fontSize: "1.5rem" }}>
               Flights Info
             </h2>
           </div>
@@ -89,8 +109,10 @@ const UserDashBoardAir: React.FC = () => {
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gap: "1.5rem",
+                gridTemplateColumns: window.innerWidth <= 768
+                  ? "1fr"
+                  : "repeat(3, 1fr)", // Three cards per row on larger screens
+                gap: window.innerWidth <= 768 ? "1.5rem" : "1rem", // Increased gap on small devices
               }}
             >
               {flights.map((flight, index) => (
@@ -103,6 +125,18 @@ const UserDashBoardAir: React.FC = () => {
                     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                     overflow: "hidden",
                     cursor: "pointer",
+                    transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                    width: "100%", // Cards take full width of their grid cell
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.03)"; // Reduced hover scale
+                    e.currentTarget.style.boxShadow =
+                      "0 8px 16px rgba(0, 0, 0, 0.2)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.style.boxShadow =
+                      "0 4px 8px rgba(0, 0, 0, 0.1)";
                   }}
                 >
                   <img
@@ -110,27 +144,27 @@ const UserDashBoardAir: React.FC = () => {
                     alt={flight.flightName}
                     style={{
                       width: "100%",
-                      height: "200px",
+                      height: "150px", // Reduced image height
                       objectFit: "cover",
                     }}
                   />
                   <div style={{ padding: "1rem" }}>
-                    <h3 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
+                    <h3 style={{ fontSize: "1rem", fontWeight: "600" }}>
                       {flight.flightName}
                     </h3>
-                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                    <p style={{ margin: "0.5rem 0", color: "#666", fontSize: "0.8rem" }}>
                       From: {flight.source} to {flight.destination}
                     </p>
-                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                    <p style={{ margin: "0.5rem 0", color: "#666", fontSize: "0.8rem" }}>
                       Airline: {flight.airline}
                     </p>
-                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                    <p style={{ margin: "0.5rem 0", color: "#666", fontSize: "0.8rem" }}>
                       Departure: {new Date(flight.departure).toLocaleString()}
                     </p>
-                    <p style={{ margin: "0.5rem 0", color: "#666" }}>
+                    <p style={{ margin: "0.5rem 0", color: "#666", fontSize: "0.8rem" }}>
                       Arrival: {new Date(flight.arrival).toLocaleString()}
                     </p>
-                    <p style={{ fontWeight: "bold", color: "#007bff" }}>
+                    <p style={{ fontWeight: "bold", color: "#007bff", fontSize: "0.9rem" }}>
                       Price: ₹{flight.price}
                     </p>
                     <button
@@ -146,6 +180,7 @@ const UserDashBoardAir: React.FC = () => {
                         border: "none",
                         borderRadius: "4px",
                         cursor: "pointer",
+                        fontSize: "0.8rem",
                       }}
                     >
                       Book Now
@@ -158,51 +193,32 @@ const UserDashBoardAir: React.FC = () => {
         </div>
 
         {/* Right Column: Google Map */}
-        <div
-          style={{
-            flex: 1,
-            position: "sticky",
-            top: "2rem",
-          }}
-        >
-          <h2 style={{ color: "#007bff", marginBottom: "1rem" }}>Google Map</h2>
+        {selectedFlight && (
           <div
             style={{
-              position: "relative",
-              height: "580px",
-              backgroundColor: "#d0e8f2", // Light blue resembling Google Maps
-              borderRadius: "8px",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-              overflow: "hidden",
+              flex: 1,
+              position: window.innerWidth <= 768 ? "relative" : "sticky",
+              top: "1rem",
+              animation: window.innerWidth <= 768
+                ? "slideUp 0.5s ease-out"
+                : "slideIn 0.5s ease-out",
+              marginTop: window.innerWidth <= 768 ? "1.5rem" : "0", // Added margin on small devices
             }}
           >
-            {/* Message at the center */}
-            {!selectedFlight && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  textAlign: "center",
-                  zIndex: 10,
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "1.2rem",
-                    fontWeight: "600",
-                    color: "#333",
-                  }}
-                >
-                  Click on a flight card to view the source, destination, and path
-                  on Google Map.
-                </p>
-              </div>
-            )}
-
-            {/* Google Map iframe */}
-            {selectedFlight && (
+            <h2 style={{ color: "#007bff", marginBottom: "1rem", fontSize: "1.5rem" }}>
+              Google Map
+            </h2>
+            <div
+              style={{
+                position: "relative",
+                height: window.innerWidth <= 768 ? "300px" : "580px", // Reduced map height on small devices
+                backgroundColor: "#d0e8f2", // Light blue resembling Google Maps
+                borderRadius: "8px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                overflow: "hidden",
+              }}
+            >
+              {/* Google Map iframe */}
               <iframe
                 title="Google Map"
                 width="100%"
@@ -214,13 +230,42 @@ const UserDashBoardAir: React.FC = () => {
                 }}
                 src={`https://www.google.com/maps?q=${encodeURIComponent(
                   selectedFlight.source
-                )}+to+${encodeURIComponent(selectedFlight.destination)}&output=embed`}
+                )}+to+${encodeURIComponent(
+                  selectedFlight.destination
+                )}&output=embed`}
                 allowFullScreen
               ></iframe>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
+      {/* Inline CSS for animations */}
+      <style>
+        {`
+          @keyframes slideIn {
+            from {
+              opacity: 0;
+              transform: translateX(100%);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+
+          @keyframes slideUp {
+            from {
+              opacity: 0;
+              transform: translateY(100%);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };

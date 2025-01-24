@@ -180,6 +180,7 @@ const Registration: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [status, setStatus] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<"ground" | "water" | "air">("ground");
+  const[showPassword,setShowPassword]=useState(false);
 
   
   const registrationSchema = Yup.object().shape({
@@ -251,10 +252,10 @@ const Registration: React.FC = () => {
 
       {/* UserName */}
       <div className="mb-3">
-        <label className="form-label">UserName</label>
+        <label className="form-label">User Name</label>
         <input
           type="text"
-          placeholder="UserName"
+          placeholder="User Name"
           {...formik.getFieldProps("username")}
           className={clsx("form-control", {
             "is-invalid": formik.touched.username && formik.errors.username,
@@ -284,17 +285,39 @@ const Registration: React.FC = () => {
       </div>
 
       {/* Password */}
-      <div className="mb-3">
+      <div className="mb-3" style={{position:"relative"}}>
         <label className="form-label">Password</label>
         <input
-          type="password"
+          type={showPassword?"text":"password"}
           placeholder="Password"
           {...formik.getFieldProps("password")}
           className={clsx("form-control", {
             "is-invalid": formik.touched.password && formik.errors.password,
             "is-valid": formik.touched.password && !formik.errors.password,
-          })}
+          })}style={{paddingRight:"50px"}}
+
         />
+        <span
+        type="button"
+        onClick={() => setShowPassword(!showPassword)} // Toggle visibility state
+        style={{
+            position: "absolute",
+            cursor: "pointer",
+            right:"40px",
+            top:"70%",
+            transform:"translateY(-50%)",
+            fontSize:"10px",
+
+            color:"#007bff",
+
+
+
+            }}
+        >
+       {showPassword ? "Hide" : "Show"} {/* Inline conditional rendering */}
+       </span>
+
+
         {formik.touched.password && formik.errors.password && (
           <div className="invalid-feedback">{formik.errors.password}</div>
         )}
@@ -339,13 +362,13 @@ const Registration: React.FC = () => {
       </div>
 
       <div style={{ marginBottom: "20px" }}>
-      <Link to="/auth/login">
+      <Link to="/auth">
           <button
             type="button"
             id="kt_login_signup_form_cancel_button"
             className="btn btn-lg btn-light-primary w-100 mb-5"
           >
-            Cancel
+           Back to login
           </button>
         </Link>
       </div>
